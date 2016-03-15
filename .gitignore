@@ -24,5 +24,6 @@ gradle.properties
 **/build/
 .gradle/
 **/bin/
+**/target/
 
 !gradle/**/*.jar
