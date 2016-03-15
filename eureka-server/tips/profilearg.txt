@@ -1,1 +1,3 @@
 ..\gradlew bootRun -Dspring.profiles.active=server2
+
+./gradlew build && java -jar build/libs/gs-spring-boot-0.1.0.jar -Dspring.profiles.active=server2
