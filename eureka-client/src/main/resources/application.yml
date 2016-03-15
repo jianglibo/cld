@@ -1,7 +1,5 @@
-# 本身也是一个client，和peer沟通。
-#server:
-#  port: 8761
-# this is eureka server port.
+server:
+  port: 8881
 
 management:
   context-path: /admin
@@ -11,12 +9,14 @@ logging:
     com.netflix.discovery: 'OFF'
     org.springframework.cloud: 'DEBUG'
     
-#eureka:
-#  instance:
-#    leaseRenewalIntervalInSeconds: 10
-#    statusPageUrlPath: /admin/info
-#    healthCheckUrlPath: /admin/health
-
+eureka:
+  instance:
+    leaseRenewalIntervalInSeconds: 10
+    statusPageUrlPath: /admin/info
+    healthCheckUrlPath: /admin/health
+  client:
+    serviceUrl:
+      defaultZone: http://localhost:8761/eureka/
 spring:
   cloud:
     config:
@@ -24,6 +24,8 @@ spring:
         git:
           uri: https://github.com/jianglibo/config-repo
           basedir: target/config
+  application:
+    name: eureka-client
 
 ---
 spring:
@@ -59,31 +61,3 @@ eureka:
     serviceUrl:
       defaultZone: ${EUREKA_SERVICE_URL:http://localhost:8761}/eureka/
           
----
-spring:
-  profiles: server1
-  application:
-    name: eureka-server1
-server:
-  port: 8761
-eureka:
-  instance:
-    hostname: ${CF_INSTANCE_IP:localhost}
-    nonSecurePort: ${CF_INSTANCE_PORT:${PORT:${server.port:8761}}}
-  client:
-    serviceUrl:
-      defaultZone: ${EUREKA_SERVICE_URL:http://localhost:8762}/eureka/
----
-spring:
-  profiles: server2
-  application:
-    name: eureka-server2
-server:
-  port: 8762
-eureka:
-  instance:
-    hostname: ${CF_INSTANCE_IP:localhost}
-    nonSecurePort: ${CF_INSTANCE_PORT:${PORT:${server.port:8762}}}
-  client:
-    serviceUrl:
-      defaultZone: ${EUREKA_SERVICE_URL:http://localhost:8761}/eureka/
