@@ -4,7 +4,7 @@ cd /opt/eureka-server
 
 function start {
     echo "starting"
-    nohup java -jar -Dspring.profiles.active=$2 eureka-server-0.0.1-SNAPSHOT.jar &
+    nohup java -jar -Dspring.profiles.active=$1 eureka-server-0.0.1-SNAPSHOT.jar &
 	echo $! > application.pid
 }
 
@@ -15,18 +15,18 @@ function stop {
 
 function restart {
     stop
-    start
+    start $1
 }
 
 if [ $1 == "start" ]
 then
-    start
+    start $2
 elif [ $1 == "stop" ]
 then
     stop
 elif [ $1 == "restart" ]
 then
-    restart
+    restart $2
 else
     echo "do nothing"
 fi
