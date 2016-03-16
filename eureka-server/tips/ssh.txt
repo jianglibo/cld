@@ -1,0 +1,3 @@
+keep public in compute you want to login.
+keep private key in you usb with you.
+至于这个key是哪里产生的，无所谓。

@@ -1,7 +1,7 @@
-ext { sbv = '1.3.3.RELEASE'; dmp = '0.5.2.RELEASE'; scsp = 'Brixton.M5' }
+ext { sbv = '1.3.3.RELEASE'; dmp = '0.5.2.RELEASE'; scsp = 'Brixton.M5'; bversion="0.0.1-SNAPSHOT"  }
 
 buildscript {
-	ext { sbv = '1.3.3.RELEASE'; dmp = '0.5.2.RELEASE'; scsp = 'Brixton.M5' }
+	ext { sbv = '1.3.3.RELEASE'; dmp = '0.5.2.RELEASE'; scsp = 'Brixton.M5'; bversion="0.0.1-SNAPSHOT" }
     repositories {
         mavenCentral()
         mavenLocal()
@@ -13,8 +13,11 @@ buildscript {
     dependencies {
         classpath("org.springframework.boot:spring-boot-gradle-plugin:${sbv}")
         classpath "io.spring.gradle:dependency-management-plugin:${dmp}"
+		classpath("org.hidetake:gradle-ssh-plugin:1.1.3")
     }
 }
+
+apply plugin: 'org.hidetake.ssh'
 
 task wrapper(type: Wrapper) {
     gradleVersion = '2.12'
