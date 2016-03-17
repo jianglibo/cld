@@ -4,7 +4,7 @@ cd /opt/eureka-server
 
 function start {
     echo "starting"
-    nohup java -jar -Dspring.profiles.active=$1 eureka-server-0.0.1-SNAPSHOT.jar &
+    nohup java -jar -Dspring.profiles.active=$1 eureka-server-0.0.1-SNAPSHOT.jar > nohub.out &
 	echo $! > application.pid
 }
 
