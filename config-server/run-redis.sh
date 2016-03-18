@@ -2,8 +2,8 @@
 
 function start {
     echo "starting"
-    nohup java -jar -Dspring.profiles.active=$2 $1 > nohub.out &
-	echo $! > $3
+    nohup src/redis-server redis.conf > nohub.out &
+	echo $! > $1
 }
 
 function stop {
@@ -12,24 +12,22 @@ function stop {
 }
 
 function restart {
-    stop $3
-    start $1 $2 $3
+    stop $1
+    start $1
 }
 
 # $1 command
-# $2 jarFile
-# $3 profile
-# $4 pidFile
+# $2 pidFile
 
 if [ $1 == "start" ]
 then
-    start $2 $3 $4
+    start $2
 elif [ $1 == "stop" ]
 then
-    stop $4
+    stop $2
 elif [ $1 == "restart" ]
 then
-    restart $2 $3 $4
+    restart $2
 else
     echo "do nothing"
 fi

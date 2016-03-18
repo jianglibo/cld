@@ -8,12 +8,18 @@ logging:
   level:
     com.netflix.discovery: 'OFF'
     org.springframework.cloud: 'DEBUG'
-    
+
+# this is office default.    
 eureka:
   instance:
+    hostname: localhost
+    nonSecurePort: 8888
     leaseRenewalIntervalInSeconds: 10
     statusPageUrlPath: /admin/info
     healthCheckUrlPath: /admin/health
+  client:
+    serviceUrl:
+      defaultZone: http://10.74.111.71:8761/eureka/
 
 spring:
   cloud:
@@ -22,6 +28,34 @@ spring:
         git:
           uri: https://github.com/jianglibo/config-repo
           basedir: target/config
+
+---
+spring:
+  profiles: home
+eureka:
+  instance:
+    hostname: localhost
+    nonSecurePort: 8888
+    leaseRenewalIntervalInSeconds: 10
+    statusPageUrlPath: /admin/info
+    healthCheckUrlPath: /admin/health
+  client:
+    serviceUrl:
+      defaultZone: http://localhost:8761/eureka/
+
+---
+spring:
+  profiles: office
+eureka:
+  instance:
+    hostname: localhost
+    nonSecurePort: 8888
+    leaseRenewalIntervalInSeconds: 10
+    statusPageUrlPath: /admin/info
+    healthCheckUrlPath: /admin/health
+  client:
+    serviceUrl:
+      defaultZone: http://10.74.111.71:8761/eureka/
 
 ---
 spring:

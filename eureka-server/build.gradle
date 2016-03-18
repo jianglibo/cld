@@ -48,8 +48,8 @@ remotes {
 }
 
 def smap = [
-    server71: [remote: remotes.fhyun71,remoteFolder:'/opt/eureka-server',jarFile:'eureka-server-0.0.1-SNAPSHOT.jar', cmdFile: 'eureka-server.sh', cmd: 'restart server71'],
-    server70: [remote: remotes.fhyun70,remoteFolder:'/opt/eureka-server',jarFile:'eureka-server-0.0.1-SNAPSHOT.jar', cmdFile: 'eureka-server.sh', cmd: 'restart server70']
+    server71: [remote: remotes.fhyun71,remoteFolder:'/opt/eureka-server',jarFile: jar.baseName + "-" + jar.version + ".jar", cmdFile: 'eureka-server.sh', cmd: 'restart server71 eurekaserver.pid'],
+    server70: [remote: remotes.fhyun70,remoteFolder:'/opt/eureka-server',jarFile: jar.baseName + "-" + jar.version + ".jar", cmdFile: 'eureka-server.sh', cmd: 'restart server70 eurekaserver.pid']
 ]
 
 

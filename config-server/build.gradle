@@ -1,3 +1,5 @@
+import java.nio.file.Paths;
+import groovy.transform.Field;
 
 apply plugin: "io.spring.dependency-management"
 apply plugin: 'java'
@@ -8,19 +10,124 @@ repositories {
     mavenCentral()
     mavenLocal()
     maven { url 'http://repo.spring.io/libs-release-local' }
-	maven {url 'http://repo.spring.io/libs-snapshot-local'}
-	maven {url 'http://repo.spring.io/libs-milestone-local'}
+    maven {url 'http://repo.spring.io/libs-snapshot-local'}
+    maven {url 'http://repo.spring.io/libs-milestone-local'}
 }
 
-dependencyManagement {
-    imports { mavenBom "org.springframework.cloud:spring-cloud-starter-parent:${scsp}" }
-}
+dependencyManagement { imports { mavenBom "org.springframework.cloud:spring-cloud-starter-parent:${scsp}"
+    } }
 
-dependencies { 
+dependencies {
     compile 'org.springframework.cloud:spring-cloud-starter-config'
     compile 'org.springframework.cloud:spring-cloud-config-server'
     compile 'org.springframework.cloud:spring-cloud-config-monitor'
     compile 'org.springframework.cloud:spring-cloud-starter-stream-redis'
     compile 'org.springframework.cloud:spring-cloud-starter-eureka'
     testCompile("org.springframework.boot:spring-boot-starter-test")
+}
+
+bootRun { systemProperties System.properties }
+
+jar {
+    baseName = 'config-server'
+    version = "${bversion}"
+}
+
+test { filter { includeTestsMatching "*Test*"
+    } }
+
+remotes {
+    fhyun71 {
+        host = '10.74.111.71'
+        user = 'root'
+        knownHosts = allowAnyHosts
+        identity = file(identityFile)
+    }
+    fhyun70 {
+        host = '10.74.111.70'
+        user = 'root'
+        knownHosts = allowAnyHosts
+        identity = file(identityFile)
+    }
+}
+
+ext {
+    pidFile = 'configserver.pid'
+    jarFile = jar.baseName + '-' + jar.version + '.jar'
+}
+
+
+def getCfg(profile) {
+    return [
+        remote: remotes.fhyun71, //
+        remoteFolder:'/opt/config-server', //
+        cmd: "restart $jarFile $profile $pidFile", //
+        cmdFile: 'config-server.sh', //
+        pidFile: pidFile, //
+        jarFile: jarFile
+    ]
+}
+
+task pn << {
+    println "aaaaaaaaaaaaa"
+    println this
+    println "${getCfg('office')}";
+    println jar.version
+}
+
+
+def _runEurekaServer(amap)  {
+    
+    def foldname = Paths.get(amap.remoteFolder).getFileName().toString();
+    def parentFolder = Paths.get(amap.remoteFolder).getParent().toString().replaceAll("\\\\", "/");
+
+    ssh.run {
+        session(amap.remote) {
+            def result = execute "ls ${parentFolder}"
+            if (!result.contains(foldname)) {
+                execute "mkdir -p ${amap.remoteFolder}"
+                put from: amap.cmdFile, into: amap.remoteFolder
+                execute "cd ${amap.remoteFolder}; sed -i 's/\r\$//' ${amap.cmdFile}"
+                execute "chmod a+x ${amap.remoteFolder}/${amap.cmdFile}"
+            }
+
+            put from: "build/libs/${amap.jarFile}", into: amap.remoteFolder
+
+            executeBackground "cd ${amap.remoteFolder}; ./${amap.cmdFile} ${amap.cmd}"
+        }
+    }
+}
+
+task startRedis << {
+    def execName = 'run-redis.sh';
+    def parentFolder = "/opt/redis-3.0.7"
+    ssh.run {
+        session(remotes.fhyun71) {
+            def result = execute "ls ${parentFolder}"
+            if (!result.contains(execName)) {
+                put from: execName, into: parentFolder
+                execute "cd ${parentFolder}; sed -i 's/\r\$//' ${execName}"
+                execute "cd ${parentFolder}; chmod a+x ${execName}"
+            }
+            executeBackground "cd ${parentFolder}; ./${execName} start redis.pid"
+        }
+    }
+}
+
+task deployserver(dependsOn: build) << {
+    def sn = System.properties.sn;
+    if (sn) {
+        _runEurekaServer(getCfg(sn))
+    } else {
+        _runEurekaServer(getCfg('office'))
+    }
+}
+
+task deployserverjust << {
+    def sn = System.properties.sn;
+    if (sn) {
+        _runEurekaServer(getCfg(sn))
+    } else {
+        _runEurekaServer(getCfg('office'))
+    }
 }
