@@ -13,8 +13,11 @@ repositories {
     maven {url 'http://repo.spring.io/libs-milestone-local'}
 }
 
-dependencyManagement { imports { mavenBom "org.springframework.cloud:spring-cloud-starter-parent:${scsp}"
-    } }
+dependencyManagement {
+    imports { //
+        mavenBom "org.springframework.cloud:spring-cloud-starter-parent:${scsp}" //
+    }
+}
 
 dependencies {
     compile 'org.springframework.cloud:spring-cloud-starter-eureka-server'
@@ -28,18 +31,16 @@ jar {
     version = "${bversion}"
 }
 
-test {
-    filter { includeTestsMatching "*Test*" }
-}
+test { filter { includeTestsMatching "*Test*" } }
 
 remotes {
-    fhyun71 {
+    server71 {
         host = '10.74.111.71'
         user = 'root'
         knownHosts = allowAnyHosts
         identity = file(identityFile)
     }
-    fhyun70 {
+    server70 {
         host = '10.74.111.70'
         user = 'root'
         knownHosts = allowAnyHosts
@@ -47,17 +48,26 @@ remotes {
     }
 }
 
-def smap = [
-    server71: [remote: remotes.fhyun71,remoteFolder:'/opt/eureka-server',jarFile: jar.baseName + "-" + jar.version + ".jar", cmdFile: 'eureka-server.sh', cmd: 'restart server71 eurekaserver.pid'],
-    server70: [remote: remotes.fhyun70,remoteFolder:'/opt/eureka-server',jarFile: jar.baseName + "-" + jar.version + ".jar", cmdFile: 'eureka-server.sh', cmd: 'restart server70 eurekaserver.pid']
-]
+ext {
+    pidFile = 'eurekaserver.pid'
+    jarFile = jar.baseName + '-' + jar.version + '.jar'
+}
 
-
+def getCfg(profile) {
+    [
+        remote: remotes[profile], //
+        remoteFolder:'/opt/eureka-server', //
+        cmd: "restart $jarFile $profile $pidFile", //
+        cmdFile: 'eureka-server.sh', //
+        pidFile: pidFile, //
+        jarFile: jarFile
+    ]
+}
 
 def _runEurekaServer(amap)  {
     def foldname = Paths.get(amap.remoteFolder).getFileName().toString();
     def parentFolder = Paths.get(amap.remoteFolder).getParent().toString().replaceAll("\\\\", "/");
-    
+
     ssh.run {
         session(amap.remote) {
             def result = execute "ls ${parentFolder}"
@@ -75,25 +85,23 @@ def _runEurekaServer(amap)  {
     }
 }
 
-def checkAndReturn(smap) {
+def checkAndReturn() {
     def sn = System.properties.sn;
     if (!sn) {
         println "*** please append -Dsn=eureka-server71,70 ***"
         System.exit(1);
     }
-    return smap[sn];
+    getCfg(sn)
 }
 
 task deployserver(dependsOn: build) << {
-    def sn = System.properties.sn; 
+    def sn = System.properties.sn;
     if (sn) {
-        _runEurekaServer(smap[sn])
+        _runEurekaServer(getCfg(sn))
     } else {
-        _runEurekaServer(smap.server71)
-        _runEurekaServer(smap.server70)
-    } 
+        _runEurekaServer(getCfg('server71'))
+        _runEurekaServer(getCfg('server70'))
+    }
 }
 
-task deployserverjust << {
-    _runEurekaServer(checkAndReturn(smap))
-}
+task deployserverjust << { _runEurekaServer(checkAndReturn()) }
