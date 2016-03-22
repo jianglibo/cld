@@ -32,3 +32,4 @@ gradle.properties
 **/bootstrap.yml
 
 **/.vagrant/
+**/ttmp/

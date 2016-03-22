@@ -65,13 +65,18 @@ Vagrant.configure(2) do |config|
   # Enable provisioning with a shell script. Additional provisioners such as
   # Puppet, Chef, Ansible, Salt, and Docker are also available. Please see the
   # documentation for more information about their specific syntax and use.
-  # config.vm.provision "shell", inline: <<-SHELL
-  #   sudo apt-get update
-  #   sudo apt-get install -y apache2
-  # SHELL
-  config.vm.define "web" do |web|
-#	web.vm.box = "apache"
+  
+  config.vm.provision "shell", inline: <<-SHELL
+	yum install -y tcl
+  SHELL
+  
+  config.vm.define "config-server" do |configServer|
 	config.vm.network "private_network", ip: "192.168.33.10"
   end
+  
+  config.vm.define "eureka-server" do |eurekaServer|
+	config.vm.network "private_network", ip: "192.168.33.11"
+  end
+
   config.vm.provision "shell", path: "setuplinuxbox.sh"
 end

@@ -1,5 +1,7 @@
 import java.nio.file.Paths;
 import groovy.transform.Field;
+import org.apache.tools.ant.filters.FixCrLfFilter
+import org.apache.tools.ant.taskdefs.FixCRLF
 
 apply plugin: "io.spring.dependency-management"
 apply plugin: 'java'
@@ -14,8 +16,11 @@ repositories {
     maven {url 'http://repo.spring.io/libs-milestone-local'}
 }
 
-dependencyManagement { imports { mavenBom "org.springframework.cloud:spring-cloud-starter-parent:${scsp}"
-    } }
+dependencyManagement {
+    imports { //
+        mavenBom "org.springframework.cloud:spring-cloud-starter-parent:${scsp}" //
+    }
+}
 
 dependencies {
     compile 'org.springframework.cloud:spring-cloud-starter-config'
@@ -33,18 +38,15 @@ jar {
     version = "${bversion}"
 }
 
-test { filter { includeTestsMatching "*Test*"
-    } }
+test {
+    filter { //
+        includeTestsMatching "*Test*" //
+    }
+}
 
 remotes {
-    fhyun71 {
-        host = '10.74.111.71'
-        user = 'root'
-        knownHosts = allowAnyHosts
-        identity = file(identityFile)
-    }
-    fhyun70 {
-        host = '10.74.111.70'
+    configServer {
+        host = '192.168.33.10'
         user = 'root'
         knownHosts = allowAnyHosts
         identity = file(identityFile)
@@ -52,50 +54,11 @@ remotes {
 }
 
 ext {
-    pidFile = 'configserver.pid'
     jarFile = jar.baseName + '-' + jar.version + '.jar'
-}
-
-
-def getCfg(profile) {
-    return [
-        remote: remotes.fhyun71, //
-        remoteFolder:'/opt/config-server', //
-        cmd: "restart $jarFile $profile $pidFile", //
-        cmdFile: 'config-server.sh', //
-        pidFile: pidFile, //
-        jarFile: jarFile
-    ]
-}
-
-task pn << {
-    println "aaaaaaaaaaaaa"
-    println this
-    println "${getCfg('office')}";
-    println jar.version
-}
-
-
-def _runEurekaServer(amap)  {
-    
-    def foldname = Paths.get(amap.remoteFolder).getFileName().toString();
-    def parentFolder = Paths.get(amap.remoteFolder).getParent().toString().replaceAll("\\\\", "/");
-
-    ssh.run {
-        session(amap.remote) {
-            def result = execute "ls ${parentFolder}"
-            if (!result.contains(foldname)) {
-                execute "mkdir -p ${amap.remoteFolder}"
-                put from: amap.cmdFile, into: amap.remoteFolder
-                execute "cd ${amap.remoteFolder}; sed -i 's/\r\$//' ${amap.cmdFile}"
-                execute "chmod a+x ${amap.remoteFolder}/${amap.cmdFile}"
-            }
-
-            put from: "build/libs/${amap.jarFile}", into: amap.remoteFolder
-
-            executeBackground "cd ${amap.remoteFolder}; ./${amap.cmdFile} ${amap.cmd}"
-        }
-    }
+    runFile = 'boot-run.tcl'
+    baseFolder = '/opt'
+    rtmpFolder = "$baseFolder/ttmp/${project.name}"
+    runFileAbs = "${rtmpFolder}/ttmp/$runFile"
 }
 
 task startRedis << {
@@ -114,20 +77,28 @@ task startRedis << {
     }
 }
 
-task deployserver(dependsOn: build) << {
-    def sn = System.properties.sn;
-    if (sn) {
-        _runEurekaServer(getCfg(sn))
-    } else {
-        _runEurekaServer(getCfg('office'))
+task prepareFiles(/*dependsOn:build*/) << {
+    delete 'ttmp'
+    mkdir 'ttmp'
+    copy {
+        from runFile
+        into "ttmp"
+        filter(FixCrLfFilter, eol: FixCrLfFilter.CrLf.newInstance('lf'))
+    }
+    copy {
+        from("build/libs") { include '*.jar' }
+        into "ttmp"
     }
 }
 
-task deployserverjust << {
-    def sn = System.properties.sn;
-    if (sn) {
-        _runEurekaServer(getCfg(sn))
-    } else {
-        _runEurekaServer(getCfg('office'))
+task uploadAndRun(dependsOn: prepareFiles) << {
+    ssh.run {
+        session(remotes.configServer) {
+            execute "rm -rvf ${rtmpFolder}; mkdir -p ${rtmpFolder}"
+            put from: "${projectDir}/ttmp", into: rtmpFolder
+            execute "chmod a+x ${runFileAbs}; ${runFileAbs}"
+//            execute "cp -Rf ${rfolder}/ttmp/** /opt/${project.name}"
+//            execute "cd /opt/${project.name}; ./boot-run.sh restart $jarFile $profile boot.pid"
+        }
     }
 }

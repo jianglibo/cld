@@ -1,19 +1,43 @@
-#!/bin/bash
+#!/bin/sh
+# first.tcl \
+exec tclsh "$0" ${1+"$@"}
 
-yum install -y tcl curl
+set javaFolder /opt/java
+set jdkFile jdk-8u73-linux-x64.tar.gz
+set jdkFolder jdk1.8.0_73
+set fileHost http://www.fh.gov.cn
 
-if [ ! -f /opt/java ]
-then
-	mkdir -p /opt/java
-fi
+if {! [file exists $javaFolder]} {
+	exec mkdir -p $javaFolder
+}
 
-cd /opt/java
+cd $javaFolder
 
-jdkfile='jdk-8u73-linux-x64.tar.gz'
+if {! [file exists $javaFolder/$jdkFile]} {
+    puts stdout "start downloading $fileHost/$jdkFile....\n"
+	exec curl -O $fileHost/$jdkFile >&  curloutput.log
+	puts stdout "download finished.\n"
+}
 
-if [ ! -f "/opt/java/$jdkfile" ]
-then
-	curl -O "http://www.fh.gov.cn/$jdkfile"
-fi
+if {! [file exists $javaFolder/$jdkFile]} {
+	puts stdout "download $javaFolder/$jdkFile failed."
+	exit 2
+}
 
-tar -zxf "$jdkfile"
+if {[file size $javaFolder/$jdkFile] < 10000} {
+	puts stdout "download $javaFolder/$jdkFile failed.deleting partial file..."
+	file delete $javaFolder/$jdkFile
+	exit 2
+}
+
+exec tar -zxf $jdkFile
+
+exec alternatives --install "/usr/bin/java" "java" "$javaFolder/$jdkFolder/bin/java" 1
+exec alternatives --install "/usr/bin/javac" "javac" "$javaFolder/$jdkFolder/bin/javac" 1
+
+puts stdout "checking java install..."
+
+if { [catch {puts [exec java -version 2>@1]} msg] } {
+	puts stdout "java install failed!"
+	exit 2
+}
