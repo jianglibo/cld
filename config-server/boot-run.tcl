@@ -4,10 +4,12 @@ exec tclsh "$0" ${1+"$@"}
 
 # runningDir, command, jarFile, profile, pidFile
 
-foreach arg $argv {
-  puts $arg
+if {$argc != 5} {
+  puts stdout "wrong para number!"
+  exit 1;
 }
 
+lassign $argv runningDir command jarFile profile pidFile
 
 proc start {jarFile profile {pidFile boot.pid}} {
   puts stdout "starting"
@@ -33,11 +35,9 @@ proc restart {jarFile profile {pidFile boot.pid}} {
 # 3 profile
 # 4 pidFile
 
-set cmd [lindex $argv 0]
-
-switch $cmd {
-	start {[start [lrange $argv 1 end]]}
-	stop {[stop [lindex $argv 3]]}
-	restart {[restart [lrange $argv 1 end]]}
+switch $command {
+	start {[start $jarFile $profile $pidFile]}
+	stop {[stop $pidFile]}
+	restart {[restart $jarFile $profile $pidFile]}
 	default {puts stdout "do nothing!"}
 }
