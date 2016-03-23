@@ -11,18 +11,43 @@ if {$argc != 5} {
 
 lassign $argv runningDir command jarFile profile pidFile
 
+if {! [file exists $runningDir]} {
+  exec mkdir -p $runningDir
+}
+
+# determine script location.
+set scriptDir [file dirname [info script]]
+puts stdout "script file location: $scriptDir"
+
+foreach f [glob -directory $scriptDir -- *] {
+  switch -glob $f {
+    *.tcl {}
+    *.sh {}
+    default {file copy -force -- $f $runningDir}
+  }
+}
+
+cd $runningDir
+
 proc start {jarFile profile {pidFile boot.pid}} {
   puts stdout "starting"
-  set processId [pid [open | nohup java -jar -Dspring.profiles.active=$profile $jarFile > nohub.out &]]
-
- 	set pidFile [open $pidFile w]
- 	puts $pidFile -nonewline $processId
- 	close $pidFile
+  puts "exec nohup java -jar -Dspring.profiles.active=$profile $jarFile > nohub.out &"
+  set processId [exec nohup java -jar -Dspring.profiles.active=$profile $jarFile > nohub.out &]
+ 	set pidFileFd [open $pidFile w]
+ 	puts $pidFileFd -nonewline $processId
+ 	close $pidFileFd
 }
 
 proc stop {{pidFile boot.pid}} {
   puts stdout "stoping"
-	exec cat $pidFile | xargs kill -s 9
+  if {[file exists $pidFile]} {
+    set fd [open $pidFile]
+    set pidNumber [read -nonewline $fd]
+    close $fd
+    exec kill -s 9 $pidNumber
+  } else {
+    puts stdout "pid file not found!"
+  }
 }
 
 proc restart {jarFile profile {pidFile boot.pid}} {

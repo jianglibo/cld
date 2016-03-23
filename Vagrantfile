@@ -6,6 +6,9 @@
 # backwards compatibility). Please don't change it unless you know what
 # you're doing.
 Vagrant.configure(2) do |config|
+
+  #config.vm.provider "hyperv"
+  config.vm.provider "virtualbox"
   # The most common configuration options are documented and commented below.
   # For a complete reference, please see the online documentation at
   # https://docs.vagrantup.com.
@@ -26,7 +29,7 @@ Vagrant.configure(2) do |config|
 
   # Create a private network, which allows host-only access to the machine
   # using a specific IP.
-  
+
   #	config.vm.network "private_network", ip: "192.168.33.10"
 
   # Create a public network, which generally matched to bridged network.
@@ -55,6 +58,8 @@ Vagrant.configure(2) do |config|
   # View the documentation for the provider you are using for more
   # information on available options.
 
+
+
   # Define a Vagrant Push strategy for pushing to Atlas. Other push strategies
   # such as FTP and Heroku are also available. See the documentation at
   # https://docs.vagrantup.com/v2/push/atlas.html for more information.
@@ -65,18 +70,18 @@ Vagrant.configure(2) do |config|
   # Enable provisioning with a shell script. Additional provisioners such as
   # Puppet, Chef, Ansible, Salt, and Docker are also available. Please see the
   # documentation for more information about their specific syntax and use.
-  
+
   config.vm.provision "shell", inline: <<-SHELL
 	yum install -y tcl
   SHELL
-  
+
   config.vm.define "config-server" do |configServer|
-	config.vm.network "private_network", ip: "192.168.33.10"
-  end
-  
-  config.vm.define "eureka-server" do |eurekaServer|
-	config.vm.network "private_network", ip: "192.168.33.11"
+	  configServer.vm.network "private_network", ip: "192.168.33.50"
   end
 
-  config.vm.provision "shell", path: "setuplinuxbox.sh"
+  config.vm.define "eureka-server" do |eurekaServer|
+	  eurekaServer.vm.network "private_network", ip: "192.168.33.51"
+  end
+
+  config.vm.provision "shell", path: "install-java.tcl"
 end

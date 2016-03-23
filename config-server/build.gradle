@@ -46,7 +46,7 @@ test {
 
 remotes {
     configServer {
-        host = '192.168.33.10'
+        host = '192.168.33.50'
         user = 'root'
         knownHosts = allowAnyHosts
         identity = file(identityFile)
@@ -54,11 +54,12 @@ remotes {
 }
 
 ext {
+    baseFolder = '/opt'
     jarFile = jar.baseName + '-' + jar.version + '.jar'
     runFile = 'boot-run.tcl'
-    baseFolder = '/opt'
     rtmpFolder = "$baseFolder/ttmp/${project.name}"
-    runFileAbs = "${rtmpFolder}/ttmp/$runFile"
+    runFileAbs = "${rtmpFolder}/$runFile"
+    runningDir = "$baseFolder/${project.name}"
 }
 
 task startRedis << {
@@ -92,13 +93,14 @@ task prepareFiles(/*dependsOn:build*/) << {
 }
 
 task uploadAndRun(dependsOn: prepareFiles) << {
+    def profile = System.properties.profile;
+    def pidFile = System.properties.pidFile
+    pidFile = pidFile ? pidFile : 'boot.pid'
     ssh.run {
         session(remotes.configServer) {
             execute "rm -rvf ${rtmpFolder}; mkdir -p ${rtmpFolder}"
-            put from: "${projectDir}/ttmp", into: rtmpFolder
-            execute "chmod a+x ${runFileAbs}; ${runFileAbs}"
-//            execute "cp -Rf ${rfolder}/ttmp/** /opt/${project.name}"
-//            execute "cd /opt/${project.name}; ./boot-run.sh restart $jarFile $profile boot.pid"
+            put from: "${projectDir}/ttmp/**", into: rtmpFolder
+            execute "chmod a+x ${runFileAbs}; ${runFileAbs} $runningDir restart $jarFile $profile $pidFile"
         }
     }
 }
