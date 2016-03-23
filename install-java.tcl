@@ -14,7 +14,7 @@ if {! [file exists $javaFolder]} {
 cd $javaFolder
 
 if {! [file exists $javaFolder/$jdkFile]} {
-    puts stdout "start downloading $fileHost/$jdkFile....\n"
+  puts stdout "start downloading $fileHost/$jdkFile....\n"
 	exec curl -O $fileHost/$jdkFile >&  curloutput.log
 	puts stdout "download finished.\n"
 }

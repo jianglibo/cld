@@ -78,6 +78,8 @@ task startRedis << {
     }
 }
 
+// build.onlyIf {System.properties.withBuild}
+
 task prepareFiles(/*dependsOn:build*/) << {
     delete 'ttmp'
     mkdir 'ttmp'

@@ -3,6 +3,7 @@
 exec tclsh "$0" ${1+"$@"}
 
 # runningDir, command, jarFile, profile, pidFile
+# example /opt/ttmp/config-server/boot-run.tcl /opt/config-server restart config-server-0.0.1-SNAPSHOT.jar office boot.pid
 
 if {$argc != 5} {
   puts stdout "wrong para number!"
@@ -29,30 +30,32 @@ foreach f [glob -directory $scriptDir -- *] {
 
 cd $runningDir
 
-proc start {jarFile profile {pidFile boot.pid}} {
+proc start {} {
   puts stdout "starting"
-  puts "exec nohup java -jar -Dspring.profiles.active=$profile $jarFile > nohub.out &"
-  set processId [exec nohup java -jar -Dspring.profiles.active=$profile $jarFile > nohub.out &]
- 	set pidFileFd [open $pidFile w]
- 	puts $pidFileFd -nonewline $processId
+  puts "exec nohup java -jar -Dspring.profiles.active=$::profile $::jarFile > nohup.out &"
+  set processId [exec nohup java -jar -Dspring.profiles.active=$::profile $::jarFile >> nohup.out &]
+ 	set pidFileFd [open $::pidFile w]
+ 	puts -nonewline $pidFileFd $processId
  	close $pidFileFd
 }
 
-proc stop {{pidFile boot.pid}} {
+proc stop {} {
   puts stdout "stoping"
-  if {[file exists $pidFile]} {
-    set fd [open $pidFile]
+  if {[file exists $::pidFile]} {
+    set fd [open $::pidFile]
     set pidNumber [read -nonewline $fd]
     close $fd
-    exec kill -s 9 $pidNumber
+    if {[string length [string trim $pidNumber]]} {
+      catch {exec kill -s 9 $pidNumber} msg
+    }
   } else {
     puts stdout "pid file not found!"
   }
 }
 
-proc restart {jarFile profile {pidFile boot.pid}} {
-  stop $pidFile
-  start $jarFile $profile $pidFile
+proc restart {} {
+  stop
+  start
 }
 
 # 1 command
@@ -61,8 +64,16 @@ proc restart {jarFile profile {pidFile boot.pid}} {
 # 4 pidFile
 
 switch $command {
-	start {[start $jarFile $profile $pidFile]}
-	stop {[stop $pidFile]}
-	restart {[restart $jarFile $profile $pidFile]}
-	default {puts stdout "do nothing!"}
+	start {
+    start
+  }
+	stop {
+    stop
+  }
+	restart {
+    restart
+  }
+	default {
+    puts stdout "do nothing!"
+  }
 }
