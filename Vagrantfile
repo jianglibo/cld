@@ -90,8 +90,9 @@ Vagrant.configure(2) do |config|
 
   config.vm.provision "shell", path: "install-java.tcl"
 
-  config.vm.provision "shell", inline: <<-SHELL
-    nmcli dev disconnect enp0s3
-  SHELL
+  # can not disable this interface.because vagrant use it.
+  #config.vm.provision "shell", inline: <<-SHELL
+  #nmcli dev disconnect enp0s3
+  #SHELL
 
 end
