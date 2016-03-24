@@ -1,5 +1,5 @@
 #!/bin/sh
-# first.tcl \
+# install-java.tcl \
 exec tclsh "$0" ${1+"$@"}
 
 set javaFolder /opt/java

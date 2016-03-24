@@ -10,16 +10,6 @@ logging:
     org.springframework.cloud: 'DEBUG'
 
 # this is office default.    
-eureka:
-  instance:
-    hostname: localhost
-    nonSecurePort: 8888
-    leaseRenewalIntervalInSeconds: 10
-    statusPageUrlPath: /admin/info
-    healthCheckUrlPath: /admin/health
-  client:
-    serviceUrl:
-      defaultZone: http://10.74.111.71:8761/eureka/
 
 spring:
   cloud:
@@ -28,34 +18,21 @@ spring:
         git:
           uri: https://github.com/jianglibo/config-repo
           basedir: target/config
-
 ---
 spring:
-  profiles: home
+  profiles: dev
 eureka:
   instance:
-    hostname: localhost
+    hostname: 192.168.33.50
     nonSecurePort: 8888
+    ipAddress: 192.168.33.50
+    preferIpAddress: true
     leaseRenewalIntervalInSeconds: 10
     statusPageUrlPath: /admin/info
     healthCheckUrlPath: /admin/health
   client:
     serviceUrl:
-      defaultZone: http://localhost:8761/eureka/
-
----
-spring:
-  profiles: office
-eureka:
-  instance:
-    hostname: localhost
-    nonSecurePort: 8888
-    leaseRenewalIntervalInSeconds: 10
-    statusPageUrlPath: /admin/info
-    healthCheckUrlPath: /admin/health
-  client:
-    serviceUrl:
-      defaultZone: http://10.74.111.71:8761/eureka/
+      defaultZone: http://192.168.33.51:8761/eureka/
 
 ---
 spring:

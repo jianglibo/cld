@@ -2,22 +2,17 @@
 server:
   port: 8761
 # this is eureka server port.
-
+    
 eureka:
   instance:
-    hostname: localhost
-  client:
-    registerWithEureka: false
-    fetchRegistry: false
-    serviceUrl:
-      defaultZone: http://${eureka.instance.hostname}:${server.port}/eureka/
+    registerWithEureka: true
+    fetchRegistry: true
+    nonSecurePort: ${server.port:8761}
+    preferIpAddress: true
     
-#eureka:
-#  instance:
-#    leaseRenewalIntervalInSeconds: 10
-#    statusPageUrlPath: /admin/info
-#    healthCheckUrlPath: /admin/health
-
+ # client:
+ #   serviceUrl:
+ #     defaultZone: ${EUREKA_SERVICE_URL:http://192.168.33.51:8761}/eureka/
 
 ---
 spring:
@@ -55,35 +50,35 @@ eureka:
           
 ---
 spring:
-  profiles: server71
+  profiles: dev51
   application:
-    name: eureka-server71
+    name: eureka-server51
 server:
   port: 8761
 eureka:
   instance:
     registerWithEureka: true
     fetchRegistry: true
-    hostname: 10.74.111.71
-    nonSecurePort: ${CF_INSTANCE_PORT:${PORT:${server.port:8761}}}
+    hostname: 192.168.33.51
+    nonSecurePort: ${server.port:8761}
     preferIpAddress: true
   client:
     serviceUrl:
-      defaultZone: ${EUREKA_SERVICE_URL:http://10.74.111.70:8761}/eureka/
+      defaultZone: http://192.168.33.52:8761/eureka/
 ---
 spring:
-  profiles: server70
+  profiles: dev52
   application:
-    name: eureka-server70
+    name: eureka-server52
 server:
   port: 8761
 eureka:
   instance:
     registerWithEureka: true
     fetchRegistry: true
-    hostname: 10.74.111.70
+    hostname: 192.168.33.52
     nonSecurePort: ${CF_INSTANCE_PORT:${PORT:${server.port:8761}}}
     preferIpAddress: true
   client:
     serviceUrl:
-      defaultZone: ${EUREKA_SERVICE_URL:http://10.74.111.71:8761}/eureka/
+      defaultZone: http://192.138.33.51:8761/eureka/

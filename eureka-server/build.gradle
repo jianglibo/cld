@@ -21,7 +21,7 @@ dependencyManagement {
 }
 
 dependencies {
-    compile 'org.springframework.cloud:spring-cloud-starter-eureka-server'
+    compile 'org.springframework.cloud:spring-cloud-starter-eureka-server' //
     testCompile("org.springframework.boot:spring-boot-starter-test")
 }
 
@@ -32,17 +32,21 @@ jar {
     version = "${bversion}"
 }
 
-test { filter { includeTestsMatching "*Test*" } }
+test {
+    filter { //
+        includeTestsMatching "*Test*" //
+    }
+}
 
 remotes {
-    server71 {
-        host = '10.74.111.71'
+    dev51 {
+        host = '192.168.33.51'
         user = 'root'
         knownHosts = allowAnyHosts
         identity = file(identityFile)
     }
-    server70 {
-        host = '10.74.111.70'
+    dev52 {
+        host = '192.168.33.52'
         user = 'root'
         knownHosts = allowAnyHosts
         identity = file(identityFile)
@@ -50,59 +54,46 @@ remotes {
 }
 
 ext {
-    pidFile = 'eurekaserver.pid'
+    baseFolder = '/opt'
     jarFile = jar.baseName + '-' + jar.version + '.jar'
+    runFile = 'boot-run.tcl'
+    rtmpFolder = "$baseFolder/ttmp/${project.name}"
+    runFileAbs = "${rtmpFolder}/$runFile"
+    runningDir = "$baseFolder/${project.name}"
 }
 
-def getCfg(profile) {
-    [
-        remote: remotes[profile], //
-        remoteFolder:'/opt/eureka-server', //
-        cmd: "restart $jarFile $profile $pidFile", //
-        cmdFile: 'eureka-server.sh', //
-        pidFile: pidFile, //
-        jarFile: jarFile
-    ]
+
+task prepareFiles() << {
+    delete 'ttmp'
+    mkdir 'ttmp'
+    copy {
+        from runFile
+        into "ttmp"
+        filter(FixCrLfFilter, eol: FixCrLfFilter.CrLf.newInstance('lf'))
+    }
+    copy {
+        from("build/libs") { include '*.jar' }
+        into "ttmp"
+    }
 }
 
-def _runEurekaServer(amap)  {
-    def foldname = Paths.get(amap.remoteFolder).getFileName().toString();
-    def parentFolder = Paths.get(amap.remoteFolder).getParent().toString().replaceAll("\\\\", "/");
-
-    ssh.run {
-        session(amap.remote) {
-            def result = execute "ls ${parentFolder}"
-            if (!result.contains(foldname)) {
-                execute "mkdir -p ${amap.remoteFolder}"
-                put from: amap.cmdFile, into: amap.remoteFolder
-                execute "cd ${amap.remoteFolder}; sed -i 's/\r\$//' ${amap.cmdFile}"
-                execute "chmod a+x ${amap.remoteFolder}/${amap.cmdFile}"
+task myenv << {
+    println System.properties.each { entry -> println "key: $entry.key, value: $entry.value" }
+}
+// boot-run.tcl /opt/eureka-server restart xx.jar dev boot.pid
+task uploadAndRun(dependsOn: prepareFiles) << {
+    def profile = System.properties.profile
+    def pidFile = System.properties.pidFile
+    pidFile = pidFile ? pidFile : 'boot.pid'
+    
+    def profiles = profile ? [profile] : ['dev51', 'dev52']
+    profiles.each { profileit ->
+        ssh.run {
+            session(remotes[profileit]) {
+                execute "rm -rvf ${rtmpFolder}; mkdir -p ${rtmpFolder}"
+                put from: "${projectDir}/ttmp/**", into: rtmpFolder
+                execute "chmod a+x ${runFileAbs}; ${runFileAbs} $runningDir restart $jarFile $profileit $pidFile"
             }
-
-            put from: "build/libs/${amap.jarFile}", into: amap.remoteFolder
-
-            executeBackground "cd ${amap.remoteFolder}; ./${amap.cmdFile} ${amap.cmd}"
         }
     }
 }
-
-def checkAndReturn() {
-    def sn = System.properties.sn;
-    if (!sn) {
-        println "*** please append -Dsn=eureka-server71,70 ***"
-        System.exit(1);
-    }
-    getCfg(sn)
-}
-
-task deployserver(dependsOn: build) << {
-    def sn = System.properties.sn;
-    if (sn) {
-        _runEurekaServer(getCfg(sn))
-    } else {
-        _runEurekaServer(getCfg('server71'))
-        _runEurekaServer(getCfg('server70'))
-    }
-}
-
-task deployserverjust << { _runEurekaServer(checkAndReturn()) }
