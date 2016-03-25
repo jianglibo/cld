@@ -60,6 +60,7 @@ eureka:
     registerWithEureka: true
     fetchRegistry: true
     hostname: 192.168.33.51
+    ipAddress: 192.168.33.51
     nonSecurePort: ${server.port:8761}
     preferIpAddress: true
   client:
@@ -77,6 +78,7 @@ eureka:
     registerWithEureka: true
     fetchRegistry: true
     hostname: 192.168.33.52
+    ipAddress: 192.168.33.52
     nonSecurePort: ${CF_INSTANCE_PORT:${PORT:${server.port:8761}}}
     preferIpAddress: true
   client:

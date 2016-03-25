@@ -17,7 +17,7 @@ spring:
       server:
         git:
           uri: https://github.com/jianglibo/config-repo
-          basedir: target/config
+#          basedir: target/config
 ---
 spring:
   profiles: dev
