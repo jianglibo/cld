@@ -77,21 +77,27 @@ Vagrant.configure(2) do |config|
   config.vm.define "config-server" do |configServer|
 	  configServer.vm.network "private_network", ip: "192.168.33.50"
     configServer.vm.provision "shell", path: "install-redis.tcl"
+    configServer.vm.provision "shell", path: "install-java.tcl"
 #    configServer.vm.provision "shell", path: "config-server/boot-run.tcl", args: [""]
   end
 
   config.vm.define "eureka-server1" do |eurekaServer1|
 	  eurekaServer1.vm.network "private_network", ip: "192.168.33.51"
+    eurekaServer1.vm.provision "shell", path: "install-java.tcl"
   end
 
   config.vm.define "eureka-server2" do |eurekaServer2|
 	  eurekaServer2.vm.network "private_network", ip: "192.168.33.52"
+    eurekaServer2.vm.provision "shell", path: "install-java.tcl"
   end
 
-  config.vm.provision "shell", path: "install-java.tcl"
+  config.vm.define "mongodb" do |mongodb|
+	  mongodb.vm.network "private_network", ip: "192.168.33.53"
+    mongodb.vm.provision "shell", path: "install-mongodb.tcl"
+  end
 
-  config.vm.provision "shell", inline: <<-SHELL
-    nmcli dev disconnect enp0s3
-  SHELL
+#  config.vm.provision "shell", inline: <<-SHELL
+#    nmcli dev disconnect enp0s3
+#  SHELL
 
 end
