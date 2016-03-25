@@ -3,5 +3,11 @@ spring:
     name: foo
   cloud:
     config:
-     uri: ${vcap.services.${PREFIX:}configserver.credentials.uri:${CONFIG_SERVER_URI:http://localhost:8888}}
-     failFast: false
+      discovery:
+        serviceId: CONFIGSERVER
+#     uri: ${CONFIG_SERVER_URI:http://192.168.33.51:8888}
+#     failFast: false
+  eureka:
+    client:
+      serviceUrl:
+        defaultZone: http://192.168.33.51:8761/eureka/
