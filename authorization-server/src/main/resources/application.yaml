@@ -1,0 +1,283 @@
+spring:
+    datasource:
+        url: jdbc:h2:~/uctest
+        username: sa
+        password:
+        driver-class-name: org.h2.Driver
+        validation-query: SELECT 1
+        test-on-borrow: true
+    jpa:
+        database: H2
+        show-sql: true
+        hibernate:
+            ddl-auto: update
+            naming-strategy: org.hibernate.cfg.ImprovedNamingStrategy
+            dialect: org.hibernate.dialect.H2Dialect
+    data:
+        rest:
+            base-uri: /api/v1
+    rabbitmq:
+        port: 5672
+        username:
+        password:
+        host: some-host
+        virtualHost: /
+    thymeleaf:
+        cache: false
+        prefix: classpath:/templates/
+        suffix: .html
+    security:
+        enable-csrf: true
+        sessions: always
+logging:
+    level:
+        cc.openscanner: DEBUG
+        org.springframework.web.servlet.mvc: DEBUG
+        org.springframework.security.web.authentication.www: DEBUG
+        org.springframework.security.oauth2: DEBUG
+server:
+    port: 80
+    session-timeout: 1800
+multipart:
+    enabled: false
+appmisc:
+    login-entry-point: /login
+    out-side-base-url: http://localhost
+    bypasssecurity: false
+    none-demo-data: false
+    multipart:
+        location:
+        max-file-size: 1M
+        max-request-size: 10M
+        file-size-threshold: 0
+    app-host: http://localhost
+    version: 1
+    oauth-clients:
+        - 
+            client: my-password-client
+            authorized-grant-types:
+                - password
+            authorities:
+                - ROLE_CLIENT
+                - ROLE_TRUSTED_CLIENT
+            scopes:
+                - read
+                - write
+                - trust
+            secret: secret
+            access-token-validity-seconds: 60
+            redirect-uris:
+            apply-auto-approve: false
+            auto-approve: false
+        - 
+            client: tclient
+            authorized-grant-types:
+                - implicit
+            authorities:
+                - ROLE_CLIENT
+            scopes:
+                - read
+                - write
+                - openid
+            secret:
+            access-token-validity-seconds: 0
+            redirect-uris:
+                - /oauthconsole
+                - http://localhost:8081/uccallback
+            apply-auto-approve: true
+            auto-approve: true
+        - 
+            client: oac
+            authorized-grant-types:
+                - authorization_code
+            authorities:
+                - ROLE_CLIENT
+            scopes:
+                - openid
+            secret: asecret
+            access-token-validity-seconds: 0
+            redirect-uris:
+                - http://localhost
+            apply-auto-approve: true
+            auto-approve: true
+        - 
+            client: web
+            authorized-grant-types:
+                - authorization_code
+            authorities:
+                - ROLE_CLIENT
+            scopes:
+                - openid
+            secret: scanner
+            access-token-validity-seconds: 0
+            redirect-uris:
+                - http://openscanner.cc/account/oauth/callback
+            apply-auto-approve: true
+            auto-approve: true
+        - 
+            client: oacrest
+            authorized-grant-types:
+                - authorization_code
+            authorities:
+                - ROLE_CLIENT
+            scopes:
+                - openid
+            secret: asecret
+            access-token-validity-seconds: 0
+            redirect-uris:
+                - http://localhost
+            apply-auto-approve: true
+            auto-approve: true
+        - 
+            client: scanhub
+            authorized-grant-types:
+                - authorization_code
+            authorities:
+                - ROLE_CLIENT
+            scopes:
+                - openid
+            secret: asecret
+            access-token-validity-seconds: 0
+            redirect-uris:
+                - https://api.openscanner.cc/uccallback
+            apply-auto-approve: true
+            auto-approve: true
+
+---
+
+spring:
+    profiles: prod
+    security:
+        enable-csrf: true
+    thymeleaf:
+        cache: false
+        prefix: classpath:/templates/
+        suffix: .html
+    datasource:
+        url: jdbc:mysql://localhost:3306/uc?useUnicode=true&characterEncoding=utf-8
+        username: uc
+        password: sdio236sdy
+        driver-class-name: com.mysql.jdbc.Driver
+        validation-query: SELECT 1
+        test-on-borrow: true
+    jpa:
+        database: MYSQL
+        show-sql: true
+        hibernate:
+            ddl-auto: update
+            naming-strategy: org.hibernate.cfg.ImprovedNamingStrategy
+            dialect: org.hibernate.dialect.MySQL5Dialect
+server:
+    port: 9001
+    session-timeout: 1800
+logging:
+    level:
+        cc.openscanner: DEBUG
+        org.springframework.web.servlet.mvc: DEBUG
+        org.springframework.security.web.authentication.www: DEBUG
+        org.springframework.security.oauth2: DEBUG
+appmisc:
+    qq-app-id: 893283223
+    qq-app-secret: 98idsssssssssssssssssssssssss
+    login-entry-point: /login
+    out-side-base-url: https://login.openscanner.cc
+    bypasssecurity: false
+    none-demo-data: false
+    multipart:
+        location:
+        max-file-size: 1M
+        max-request-size: 10M
+        file-size-threshold: 0
+    app-host: https://login.openscanner.cc
+    version: 1
+    oauth-clients:
+        - 
+            client: my-password-client
+            authorized-grant-types:
+                - password
+            authorities:
+                - ROLE_CLIENT
+                - ROLE_TRUSTED_CLIENT
+            scopes:
+                - read
+                - write
+                - trust
+            secret: secret
+            access-token-validity-seconds: 60
+            redirect-uris:
+            apply-auto-approve: false
+            auto-approve: false
+        - 
+            client: tclient
+            authorized-grant-types:
+                - implicit
+            authorities:
+                - ROLE_CLIENT
+            scopes:
+                - read
+                - write
+                - openid
+            secret:
+            access-token-validity-seconds: 0
+            redirect-uris:
+                - /oauthconsole
+                - http://localhost:8081/uccallback
+            apply-auto-approve: true
+            auto-approve: true
+        - 
+            client: oac
+            authorized-grant-types:
+                - authorization_code
+            authorities:
+                - ROLE_CLIENT
+            scopes:
+                - openid
+            secret: asecret
+            access-token-validity-seconds: 0
+            redirect-uris:
+            apply-auto-approve: true
+            auto-approve: true
+        - 
+            client: web
+            authorized-grant-types:
+                - authorization_code
+            authorities:
+                - ROLE_CLIENT
+            scopes:
+                - openid
+            secret: scanner
+            access-token-validity-seconds: 0
+            redirect-uris:
+                - http://openscanner.cc/account/oauth/callback
+                - http://192.168.1.188:8080/account/oauth/callback
+                - http://localhost:8080/openscanner-web/account/oauth/callback
+            apply-auto-approve: true
+            auto-approve: true
+        - 
+            client: oacrest
+            authorized-grant-types:
+                - authorization_code
+            authorities:
+                - ROLE_CLIENT
+            scopes:
+                - openid
+            secret: asecret
+            access-token-validity-seconds: 0
+            redirect-uris:
+            apply-auto-approve: true
+            auto-approve: true
+        - 
+            client: scanhub
+            authorized-grant-types:
+                - authorization_code
+            authorities:
+                - ROLE_CLIENT
+            scopes:
+                - openid
+            secret: asecret
+            access-token-validity-seconds: 0
+            redirect-uris:
+                - https://api.openscanner.cc/uccallback
+                - http://localhost/uccallback
+            apply-auto-approve: true
+            auto-approve: true

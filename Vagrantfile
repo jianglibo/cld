@@ -76,7 +76,7 @@ Vagrant.configure(2) do |config|
   SHELL
   config.vm.define "config-server" do |configServer|
 	  configServer.vm.network "private_network", ip: "192.168.33.50"
-    configServer.vm.provision "shell", path: "install-redis.tcl"
+    configServer.vm.provision "shell", path: "install-redis-systemd.tcl"
     configServer.vm.provision "shell", path: "install-java.tcl"
 #    configServer.vm.provision "shell", path: "config-server/boot-run.tcl", args: [""]
   end

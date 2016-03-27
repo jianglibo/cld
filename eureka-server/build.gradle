@@ -1,5 +1,7 @@
 import java.nio.file.Paths;
 import org.apache.tools.ant.filters.FixCrLfFilter
+import org.apache.tools.ant.taskdefs.FixCRLF
+import org.apache.tools.ant.filters.ReplaceTokens
 
 apply plugin: "io.spring.dependency-management"
 apply plugin: 'java'
@@ -60,16 +62,30 @@ ext {
     rtmpFolder = "$baseFolder/ttmp/${project.name}"
     runFileAbs = "${rtmpFolder}/$runFile"
     runningDir = "$baseFolder/${project.name}"
+    unitFile = 'eureka-server.service'
+	systemdFolder = '/etc/systemd/system/'
 }
 
 
 task prepareFiles() << {
+	String profile = System.properties.profile;
+	
+	if (!profile) {
+		println "please add -Dprofile=dev51 etc"
+		System.exit(1)
+	}
+	
+	project.ext.profile = profile
+    
+	String runningDirString = runningDir
+	String jarFileString = jarFile
     delete 'ttmp'
     mkdir 'ttmp'
     copy {
-        from runFile
+        from(projectDir) { include '*.tcl' }
         into "ttmp"
         filter(FixCrLfFilter, eol: FixCrLfFilter.CrLf.newInstance('lf'))
+        filter(ReplaceTokens, tokens: [runningDir: runningDirString, jarFile: jarFileString, profile: profile])
     }
     copy {
         from("build/libs") { include '*.jar' }
@@ -77,9 +93,6 @@ task prepareFiles() << {
     }
 }
 
-task myenv << {
-    println System.properties.each { entry -> println "key: $entry.key, value: $entry.value" }
-}
 // boot-run.tcl /opt/eureka-server restart xx.jar dev boot.pid
 task uploadAndRun(dependsOn: prepareFiles) << {
     def profile = System.properties.profile
@@ -97,3 +110,30 @@ task uploadAndRun(dependsOn: prepareFiles) << {
         }
     }
 }
+
+task createSystemdUnitFile << {
+	String profile = System.properties.profile;
+	
+	if (!profile) {
+		println "please add -Dprofile=dev51 etc"
+		System.exit(1)
+	}
+	
+	ssh.run {
+		session(remotes[profile]) {
+      		put from: "${projectDir}/$unitFile", into: systemdFolder
+            execute "chmod 664 ${systemdFolder}${unitFile}; systemctl daemon-reload; systemctl enable $unitFile"
+        }
+    }
+}
+
+task runSystemd(dependsOn: prepareFiles) << {
+    ssh.run {
+        session(remotes[profile]) {
+            execute "rm -rvf ${rtmpFolder}; mkdir -p ${rtmpFolder}"
+            put from: "${projectDir}/ttmp/**", into: rtmpFolder
+            execute "chmod a+x ${rtmpFolder}/*.tcl;systemctl restart $unitFile"
+        }
+    }
+}
+

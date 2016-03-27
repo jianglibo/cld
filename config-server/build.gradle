@@ -2,6 +2,9 @@ import java.nio.file.Paths;
 import groovy.transform.Field;
 import org.apache.tools.ant.filters.FixCrLfFilter
 import org.apache.tools.ant.taskdefs.FixCRLF
+import org.apache.tools.ant.filters.ReplaceTokens
+
+//https://docs.gradle.org/current/javadoc/org/gradle/api/Project.html
 
 // gradlew :config-server:uploadAndRun -Dprofile=dev
 apply plugin: "io.spring.dependency-management"
@@ -46,7 +49,7 @@ test {
 }
 
 remotes {
-    configServer {
+    dev {
         host = System.properties.host ? System.properties.host : '192.168.33.50' //
         user = 'root' //
         knownHosts = allowAnyHosts //
@@ -61,36 +64,34 @@ ext {
     rtmpFolder = "$baseFolder/ttmp/${project.name}"
     runFileAbs = "${rtmpFolder}/$runFile"
     runningDir = "$baseFolder/${project.name}"
+	unitFile = 'config-server.service'
+	systemdFolder = '/etc/systemd/system/'
 }
 
-task startRedis << {
-    def execName = 'run-redis.sh';
-    def parentFolder = "/opt/redis-3.0.7"
-    ssh.run {
-        session(remotes.fhyun71) {
-            def result = execute "ls ${parentFolder}"
-            if (!result.contains(execName)) {
-                put from: execName, into: parentFolder
-                execute "cd ${parentFolder}; sed -i 's/\r\$//' ${execName}"
-                execute "cd ${parentFolder}; chmod a+x ${execName}"
-            }
-            executeBackground "cd ${parentFolder}; ./${execName} start redis.pid"
-        }
-    }
-}
-
-// build.onlyIf {System.properties.withBuild}
 
 task prepareFiles() << {
+	String profile = System.properties.profile;
+	
+	if (!profile) {
+		println "please add -Dprofile=dev etc"
+		System.exit(1)
+	}
+	
+	project.ext.profile = profile
+    
+	String runningDirString = runningDir
+	String jarFileString = jarFile
+
     delete 'ttmp'
     mkdir 'ttmp'
     copy {
-        from runFile
+        from(projectDir) { include '*.tcl' }
         into "ttmp"
         filter(FixCrLfFilter, eol: FixCrLfFilter.CrLf.newInstance('lf'))
+        filter(ReplaceTokens, tokens: [runningDir: runningDirString, jarFile: jarFileString, profile: profile])
     }
     copy {
-        from("build/libs") { include '*.jar' }
+        from('build/libs') { include '*.jar' }
         into "ttmp"
     }
 }
@@ -105,6 +106,34 @@ task uploadAndRun(dependsOn: prepareFiles) << {
             execute "rm -rvf ${rtmpFolder}; mkdir -p ${rtmpFolder}"
             put from: "${projectDir}/ttmp/**", into: rtmpFolder
             execute "chmod a+x ${runFileAbs}; ${runFileAbs} $runningDir restart $jarFile $profile $pidFile"
+        }
+    }
+}
+
+task createSystemdUnitFile << {
+	String profile = System.properties.profile;
+	
+	if (!profile) {
+		println "please add -Dprofile=dev etc"
+		System.exit(1)
+	}
+	
+	project.ext.profile = profile
+
+	ssh.run {
+		session(remotes[profile]) {
+      		put from: "${projectDir}/$unitFile", into: systemdFolder
+            execute "chmod 664 ${systemdFolder}${unitFile}; systemctl daemon-reload; systemctl enable $unitFile"
+        }
+    }
+}
+
+task runSystemd(dependsOn: prepareFiles) << {
+    ssh.run {
+        session(remotes[project.ext.profile]) {
+            execute "rm -rvf ${rtmpFolder}; mkdir -p ${rtmpFolder}"
+            put from: "${projectDir}/ttmp/**", into: rtmpFolder
+            execute "chmod a+x ${rtmpFolder}/*.tcl;systemctl restart $unitFile"
         }
     }
 }

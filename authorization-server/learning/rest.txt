@@ -1,0 +1,10 @@
+HATEOAS, an abbreviation for Hypermedia as the Engine of Application State, is a constraint of the REST application architecture that distinguishes it from most other network application architectures. The principle is that a client interacts with a network application entirely through hypermedia provided dynamically by application servers
+HAL(Hypertext Application Language): http://stateless.co/hal_specification.html
+http://docs.spring.io/spring-hateoas/docs/current/reference/html/
+
+manytomany
+
+RepositoryPropertyReferenceController
+
+
+org.springframework.hateoas.Resources

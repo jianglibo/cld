@@ -1,0 +1,29 @@
+ Request for Resource
+      |
+      | HTTP request
+      v
+  Resolvers chain: FirstResolver, SecondResolver, ThirdResolver
+  (each resolver can return the resource or delegate to the next one)
+      |
+      | Resolved Resource
+      v
+  Transformers chain: FirstTransformer, SecondTransformer
+  (each transformer can transform the resource or just pass it along without modification)
+      |
+      | Transformed Resource
+      v
+  HTTP Response with Resource content
+  
+  
+  Resource link in a template source file
+ |
+ | Resource path (like “/css/main.css”)
+ v
+ Resolvers chain: FirstResolver, SecondResolver, ThirdResolver
+ (each resolver can modify the resource path or delegate to the next one)
+ |
+ | Updated resource path (like “/css/main-0e37f12.css”)
+ v
+ Resource link in a rendered template
+ 
+ 

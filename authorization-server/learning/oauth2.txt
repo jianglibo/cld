@@ -1,0 +1,60 @@
+先引导用户进入：
+/oauth/authorize?client_id=xxx,responsetype,
+
+http://localhost:8080/sparklr2/oauth/authorize?client_id=tonr&redirect_uri=http://localhost:8081/sparklr/photos&response_type=code&scope=read%20write&state=zXRbPN
+http://localhost/oauth/authorize?client_id=tonr&redirect_uri=http://localhost:8081/sparklr/photos&response_type=code&scope=read%20write&state=zXRbPN
+
+http://localhost:8081/sparklr/photos?code=kjbWVQ&state=zXRbPN
+
+-->因为/oauth/authorize受到保护，会引导用户进入/login页面，用户登录之后， 从新回到/oauth/authorize?
+--》不过不是autoapprval，就会显示确认页面，如果是auto的话，直接进入接下去的流程。
+
+AuthorizationEndpoint -> process get and post
+
+OAuth2Utils defined parameter names.
+client_id
+state
+scope
+redirect_uri
+response_type
+user_oauth_approval
+scope.
+grant_type
+
+1、在uc里面新建一个client，redirect_uri是oac里面的路径。
+2、从oac里面发出登录请求
+
+http://localhost/oauth/authorize?client_id=oac&redirect_uri=http://localhost:8081/uccallback&response_type=code&scope=openid&state=123456
+http://localhost:8081/uccallback?code=GCOjVJ
+
+得到code之后：
+
+POST https://localhost/oauth/token
+Content-type: application/x-www-form-urlencoded
+client_id=CLIENT_ID&redirect_uri=REDIRECT_URI&client_secret=CLIENT_SECRET&code=AUTHORIZATION_CODE&grant_type=authorization_code
+
+2b718b76-9944-41dc-b744-83ef0db15b5d
+
+classes:
+AuthorizationEndpoint
+AuthorizationEndpoint
+TokenEndpoint
+CheckTokenEndpoint
+WhitelabelApprovalEndpoint
+AlpsController
+ExceptionTranslationFilter
+RepositoryEntityController
+
+[org.springframework.security.web.context.request.async.WebAsyncManagerIntegrationFilter@687db034,
+ org.springframework.security.web.context.SecurityContextPersistenceFilter@10e6947a,
+  org.springframework.security.web.header.HeaderWriterFilter@2f76fbcf,
+  org.springframework.security.web.csrf.CsrfFilter@ba5d115,
+  org.springframework.security.web.authentication.logout.LogoutFilter@367fae45,
+  org.springframework.security.web.savedrequest.RequestCacheAwareFilter@356ed20a,
+  org.springframework.security.web.servletapi.SecurityContextHolderAwareRequestFilter@2d5effeb,
+  org.springframework.security.web.authentication.AnonymousAuthenticationFilter@2530decf, org.springframework.security.web.session.SessionManagementFilter@5609a67b, cc.openscanner.uc.config.UcExceptionTranslationFilter@1711f06f,
+  org.springframework.security.web.access.intercept.FilterSecurityInterceptor@272a0301]
+
+
+参考网址：
+https://auth0.com/docs/protocols#4

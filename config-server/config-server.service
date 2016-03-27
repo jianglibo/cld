@@ -1,0 +1,11 @@
+[Unit]
+Description=Spring config server
+After=network.target
+
+[Service]
+ExecStart=/opt/ttmp/config-server/boot-run-systemd.tcl
+Type=simple
+PIDFile=/var/run/config_server.pid
+
+[Install]
+WantedBy=multi-user.target

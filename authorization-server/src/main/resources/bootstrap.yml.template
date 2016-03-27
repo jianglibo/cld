@@ -1,0 +1,11 @@
+spring:
+  application:
+    name: authorization-server
+#  cloud:
+#    config:
+#     uri: ${CONFIG_SERVER_URI:http://:8888}
+#     failFast: false
+eureka:
+  client:
+    serviceUrl:
+      defaultZone: ${EUREKA_SERVER_URI:http://192.168.33.51:8761/eureka/}

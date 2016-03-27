@@ -1,0 +1,20 @@
+ ## ExpressionBasedPreInvocationAdvice
+ * before
+ 
+ ## MethodSecurityEvaluationContext  
+ 
+ MethodSecurityExpressionHandler
+ 
+ ## ExceptionTranslationFilter
+ 
+ # FilterSecurityInterceptor
+ 
+ # MethodSecurityEvaluationContext
+ 
+ # DefaultWebSecurityExpressionHandler 对于url interceptor
+ 
+ DenyAllPermissionEvaluator
+ 
+ WebExpressionVoter这个是投票器。
+ 
+ 访问拒绝，先不要省略ROLE_前缀。
