@@ -18,6 +18,7 @@ puts stdout $msg
 if {[string match "*command not found*" $msg] || [string match "*no such file or directory*" $msg]} {
 	puts stdout "gcc not installed, start to install."
 	exec yum install -y gcc
+	puts stdout "gcc install successly."
 }
 
 if {! [file exists $redisFolder]} {

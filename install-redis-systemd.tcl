@@ -22,6 +22,7 @@ puts stdout $msg
 if {[string match "*command not found*" $msg] || [string match "*no such file or directory*" $msg]} {
 	puts stdout "gcc not installed, start to install."
 	exec yum install -y gcc
+	puts stdout "gcc install successly."
 }
 
 if {! [file exists $redisFolder]} {
@@ -90,12 +91,18 @@ if {[file exists $unitFile]} {
 		WantedBy=multi-user.target
 	}
 	foreach line [split [format $content $redisFolder/$extractFolder $redisFolder/$extractFolder] \n] {
-		puts $line
+		puts $line........
 		puts $unitFd [string trim $line]
 	}
 	close $unitFd
-	exec systemctl daemon-reload
-	exec systemctl enable redis.service
+	#code line in catch may output content to stderr, that make tcl script looks like wrong, but actually not.
+	catch {
+		exec systemctl daemon-reload
+		exec systemctl enable redis.service
+	} msg
+
+	puts stdout $msg
+
 }
 
 puts stdout "redis installed successly. starting reids..."
