@@ -1,3 +1,7 @@
+import org.apache.tools.ant.filters.FixCrLfFilter
+import org.apache.tools.ant.taskdefs.FixCRLF
+import org.apache.tools.ant.filters.ReplaceTokens
+
 ext { sbv = '1.3.3.RELEASE'; dmp = '0.5.2.RELEASE'; scsp = 'Brixton.M5'; bversion="0.0.1-SNAPSHOT"  }
 
 buildscript {
@@ -21,4 +25,70 @@ apply plugin: 'org.hidetake.ssh'
 
 task wrapper(type: Wrapper) {
     gradleVersion = '2.12'
+}
+
+remotes {
+    rmt {
+        host = System.properties.host
+        user = 'root'
+        knownHosts = allowAnyHosts
+        identity = file(identityFile)
+    }
+}
+
+ext {
+    baseFolder = '/opt'
+    rtmpFolder = "$baseFolder/ttmp/${project.name}"
+}
+
+task copyTcls << {
+//	delete 'ttmp/*'
+	def folder = new File( 'ttmp' )
+	if( !folder.exists() ) {
+		folder.mkdirs()
+	} else {
+		delete fileTree('ttmp') {
+			include '*'
+		}
+	}
+	copy {
+		from(projectDir) { include '*.tcl' }
+		into "ttmp"
+		filter(FixCrLfFilter, eol: FixCrLfFilter.CrLf.newInstance('lf'))
+//		filter(ReplaceTokens, tokens: [runningDir: runningDirString, jarFile: jarFileString, profile: profile])
+	}
+}
+
+//task myTask { configure closure }
+//task myTask << {}
+task mysqlCluster << {
+	project.ext.installTcl = 'install-mysql-cluster.tcl'
+}
+
+task java << {
+	project.ext.installTcl = 'install-java.tcl'
+}
+
+task redis << {
+	project.ext.installTcl = 'install-redis.tcl'
+}
+
+task mongodb << {
+	project.ext.installTcl = 'install-mongodb.tcl'
+}
+
+task install(dependsOn: copyTcls) << {
+	def host = System.properties.host
+
+	if (!host) {
+		println "please add -Dhost=xxxx"
+		System.exit(0)
+	}
+  ssh.run {
+    session(remotes.rmt) {
+        execute "rm -rvf ${rtmpFolder}; mkdir -p ${rtmpFolder}"
+        put from: "${projectDir}/ttmp/**", into: rtmpFolder
+        execute "chmod a+x ${rtmpFolder}/*.tcl;${rtmpFolder}/$installTcl"
+    }
+  }
 }

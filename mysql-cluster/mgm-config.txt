@@ -1,0 +1,56 @@
+#
+# Configuration file for MyCluster
+# config.ini
+
+[NDB_MGMD DEFAULT]
+Portnumber=1186
+
+[NDB_MGMD]
+NodeId=49
+HostName=192.168.33.50
+DataDir=/root/MySQL_Cluster/49/
+Portnumber=1186
+
+[NDB_MGMD]
+NodeId=52
+HostName=192.168.33.51
+DataDir=/root/MySQL_Cluster/52/
+Portnumber=1186
+
+[TCP DEFAULT]
+SendBufferMemory=4M
+ReceiveBufferMemory=4M
+
+[NDBD DEFAULT]
+BackupMaxWriteSize=1M
+BackupDataBufferSize=16M
+BackupLogBufferSize=4M
+BackupMemory=20M
+BackupReportFrequency=10
+MemReportFrequency=30
+LogLevelStartup=15
+LogLevelShutdown=15
+LogLevelCheckpoint=8
+LogLevelNodeRestart=15
+DataMemory=1M
+IndexMemory=1M
+MaxNoOfTables=4096
+MaxNoOfTriggers=3500
+NoOfReplicas=2
+StringMemory=25
+DiskPageBufferMemory=64M
+SharedGlobalMemory=20M
+LongMessageBuffer=32M
+MaxNoOfConcurrentTransactions=16384
+BatchSizePerLocalScan=512
+FragmentLogFileSize=64M
+NoOfFragmentLogFiles=16
+RedoBuffer=32M
+MaxNoOfExecutionThreads=2
+StopOnError=false
+LockPagesInMainMemory=1
+TimeBetweenEpochsTimeout=32000
+TimeBetweenWatchdogCheckInitial=60000
+TransactionInactiveTimeout=60000
+HeartbeatIntervalDbDb=15000
+HeartbeatIntervalDbApi=15000
