@@ -1,25 +1,25 @@
 #!/bin/sh
 # install-redis.tcl \
 exec tclsh "$0" ${1+"$@"}
-package require cmdline
+#package require cmdline
 #dox2unix
 lappend auto_path [file dirname [info script]]
 
-set options {
-    {mgmhosts.arg "" "comma seperated host(ip) names"}
-    {mgmdatadir.arg "/opt/mysql-cluster" "mgm DataDir"}
-    {debug  "Turn on debugging, default=off"}
-}
+#set options {
+#    {mgmhosts.arg "" "comma seperated host(ip) names"}
+#    {mgmdatadir.arg "/opt/mysql-cluster" "mgm DataDir"}
+#    {debug  "Turn on debugging, default=off"}
+#}
 
-set usage ":config-mysql-cluster.tcl \[options] filename ...\noptions:"
+#set usage ":config-mysql-cluster.tcl \[options] filename ...\noptions:"
 
-if {[catch {array set params [cmdline::getoptions ::argv $options $usage]} msg o]} {
-	 if {"CMDLINE USAGE" eq [dict get $o -errorcode]} {
-		 puts $msg
-	 } else {
-		 puts $msg
-	 }
-	 exit 1
+#if {[catch {array set params [cmdline::getoptions ::argv $options $usage]} msg o]} {
+#	 if {"CMDLINE USAGE" eq [dict get $o -errorcode]} {
+#		 puts $msg
+#	 } else {
+#		 puts $msg
+#	 }
+#	 exit 1
 
 #-errorcode -code -level -errorinfo -errorline
 #	 puts "-errorcode:[dict get $o -errorcode]"
@@ -27,7 +27,10 @@ if {[catch {array set params [cmdline::getoptions ::argv $options $usage]} msg o
 #	 puts [dict get $o -level]
 #	 puts [dict get $o -errorinfo]
 #	 puts [dict get $o -errorline]
-}
+#}
+
+package require ArgParser
+ArgParser::parse ::argv
 
 set mgmhosts $params(mgmhosts)]
 
