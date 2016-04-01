@@ -1,36 +1,37 @@
 #!/bin/sh
 # install-redis.tcl \
 exec tclsh "$0" ${1+"$@"}
-#package require cmdline
 #dox2unix
+
+if {0} {
+	before install mysqlcluster,	we must know how many machines to install, how many apiNodes and sqlNodes to run on single machine.
+	as a convenience, we run one manageNode per machine, run one dataNode per machine.and run multiple sqlNode(apiNode) on one machine.
+
+	every role need different config file and start command.
+	for management node:
+	config.ini
+	start command
+}
+
+package require yaml
+
 lappend auto_path [file dirname [info script]]
 
-#set options {
-#    {mgmhosts.arg "" "comma seperated host(ip) names"}
-#    {mgmdatadir.arg "/opt/mysql-cluster" "mgm DataDir"}
-#    {debug  "Turn on debugging, default=off"}
-#}
+set scriptDir [file dirname [info script]]
+lappend auto_path $scriptDir
 
-#set usage ":config-mysql-cluster.tcl \[options] filename ...\noptions:"
+if {$argc != 1} {
+  puts stderr "please add config file parameter."
+  exit 1
+}
 
-#if {[catch {array set params [cmdline::getoptions ::argv $options $usage]} msg o]} {
-#	 if {"CMDLINE USAGE" eq [dict get $o -errorcode]} {
-#		 puts $msg
-#	 } else {
-#		 puts $msg
-#	 }
-#	 exit 1
+set cfgFile [file join $scriptDir [lindex $argv 0]]
+catch {[set configDict [::yaml::yaml2dict -file $cfgFile]]} msg o
 
-#-errorcode -code -level -errorinfo -errorline
-#	 puts "-errorcode:[dict get $o -errorcode]"
-#	 puts [dict get $o -code]
-#	 puts [dict get $o -level]
-#	 puts [dict get $o -errorinfo]
-#	 puts [dict get $o -errorline]
-#}
-
-package require ArgParser
-ArgParser::parse ::argv
+if {! ([dict get $o -errorcode] eq {NONE})} {
+  puts stderr $msg
+  exit 1
+}
 
 set mgmhosts $params(mgmhosts)]
 

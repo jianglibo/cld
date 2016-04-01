@@ -1,0 +1,29 @@
+manageNodes:
+  dataDir: /opt/mysql-cluster
+  nodes:
+    - ip: 192.168.33.50
+      nodeIds:
+        - 50
+    - ip: 192.168.33.51
+      nodeIds:
+        - 51
+dataNodes:
+  dataDir: /opt/mysql-cluster
+  nodes:
+    - ip: 192.168.33.52
+      nodeIds:
+        - 1
+    - ip: 192.168.33.53
+      nodeIds:
+        - 2
+sqlNodes:
+  dataDir: /opt/mysql-cluster
+  nodes:
+    - ip: 192.168.33.50
+      nodeIds:
+        - 100
+        - 101
+    - ip: 192.168.33.51
+      nodeIds:
+        - 102
+        - 103
