@@ -48,25 +48,38 @@ task copyTcls << {
 		folder.mkdirs()
 	} else {
 		delete fileTree('ttmp') {
-			include '*'
+			include '**/*'
 		}
 	}
 	copy {
-		from(projectDir) { include '*.tcl' }
-		into "ttmp"
+		from("${projectDir}/scripts/${installFolder}")
+		into "ttmp/${installFolder}"
 		filter(FixCrLfFilter, eol: FixCrLfFilter.CrLf.newInstance('lf'))
 //		filter(ReplaceTokens, tokens: [runningDir: runningDirString, jarFile: jarFileString, profile: profile])
+	}
+
+	copy {
+		from("${projectDir}/scripts/share")
+		into "ttmp/share"
+		filter(FixCrLfFilter, eol: FixCrLfFilter.CrLf.newInstance('lf'))
+	}
+
+	copy {
+		from("${projectDir}/scripts/pkgIndex.tcl")
+		into "ttmp"
+		filter(FixCrLfFilter, eol: FixCrLfFilter.CrLf.newInstance('lf'))
 	}
 }
 
 //task myTask { configure closure }
 //task myTask << {}
+
 task mysqlCluster << {
 	project.ext.installTcl = 'install-mysql-cluster.tcl'
 }
 
 task java << {
-	project.ext.installTcl = 'install-java.tcl'
+	project.ext.installFolder = 'java'
 }
 
 task redis << {
@@ -84,11 +97,38 @@ task install(dependsOn: copyTcls) << {
 		println "please add -Dhost=xxxx"
 		System.exit(0)
 	}
+
+	def execFile = "${rtmpFolder}/ttmp/${installFolder}/install.tcl"
   ssh.run {
     session(remotes.rmt) {
         execute "rm -rvf ${rtmpFolder}; mkdir -p ${rtmpFolder}"
-        put from: "${projectDir}/ttmp/**", into: rtmpFolder
-        execute "chmod a+x ${rtmpFolder}/*.tcl;${rtmpFolder}/$installTcl"
+        put from: "${projectDir}/ttmp", into: rtmpFolder
+        execute "chmod -R a+x ${execFile};${execFile}"
     }
   }
+}
+
+task lineReader << {
+	File yml = new File('mysql-cluster/cluster-config-local.yml')
+	def ips = []
+	yml.eachLine {line ->
+		def m = line =~ /.*ip[^0-9]+(\d+\.\d+\.\d+\.\d+)[^0-9]*/
+		if (m.matches()) {
+			ips << m[0][1]
+		}
+	}
+	ips.unique().each {
+		println it
+	}
+	println remotes.rmt.getClass()
+	println remotes.getClass()
+
+	def r = remotes.rmt
+	r.setProperty('host', '192.168.33.50')
+
+	ssh.run {
+		session(r) {
+			execute 'ls -lh'
+		}
+	}
 }

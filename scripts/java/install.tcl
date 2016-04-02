@@ -2,6 +2,11 @@
 # install-java.tcl \
 exec tclsh "$0" ${1+"$@"}
 
+set scriptDir [file dirname [info script]]
+lappend auto_path [file join $scriptDir ..]
+
+package require AppDetecter
+
 set javaFolder /opt/java
 set jdkFile jdk-8u73-linux-x64.tar.gz
 set jdkFolder jdk1.8.0_73
