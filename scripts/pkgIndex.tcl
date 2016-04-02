@@ -11,6 +11,7 @@
 package ifneeded AppDetecter 1.0 [list source [file join $dir share/app-detecter.tcl]]
 package ifneeded ArgParser 1.0 [list source [file join $dir mysql-cluster/arg-parser.tcl]]
 package ifneeded CommonInstaller 1.0 [list source [file join $dir share/common-installer.tcl]]
+package ifneeded CommonUtil 1.0 [list source [file join $dir share/common-util.tcl]]
 package ifneeded ManageRole 1.0 [list source [file join $dir mysql-cluster/manage-role.tcl]]
 package ifneeded MysqlClusterInstaller 1.0 [list source [file join $dir mysql-cluster/mysql-cluster-installer.tcl]]
 package ifneeded confutil 1.0 [list source [file join $dir mysql-cluster/config-util.tcl]]

@@ -1,21 +1,19 @@
 package provide MysqlClusterInstaller 1.0
 
 namespace eval ::MysqlClusterInstaller {
-	variable mysqlFolder /opt/mysql-cluster
 	variable rs MySQL-Cluster-gpl-7.4.10-1.el7.x86_64.rpm-bundle.tar
 	variable host http://www.fh.gov.cn
 }
 
 #http://dev.mysql.com/get/Downloads/MySQL-Cluster-7.4
 
-proc ::MysqlClusterInstaller::install {} {
-	variable mysqlFolder
+proc ::MysqlClusterInstaller::install {tmpFolder} {
 
-	if {! [file exists $mysqlFolder]} {
-		exec mkdir -p $mysqlFolder
+	if {! [file exists $tmpFolder]} {
+		exec mkdir -p $tmpFolder
 	}
 
-	cd $mysqlFolder
+	cd $tmpFolder
 
 	if {! [file exists $rs]} {
 		exec curl -OL $host/$rs >& curloptout.log

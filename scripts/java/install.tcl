@@ -2,8 +2,8 @@
 # install-java.tcl \
 exec tclsh "$0" ${1+"$@"}
 
-set scriptDir [file dirname [info script]]
-lappend auto_path [file join $scriptDir ..]
+set ::baseDir [file join [file dirname [info script]] ..]
+lappend auto_path $::baseDir
 
 package require AppDetecter
 

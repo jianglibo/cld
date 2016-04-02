@@ -75,7 +75,7 @@ task copyTcls << {
 //task myTask << {}
 
 task mysqlCluster << {
-	project.ext.installTcl = 'install-mysql-cluster.tcl'
+	project.ext.installFolder = 'mysql-cluster'
 }
 
 task java << {
@@ -109,7 +109,7 @@ task install(dependsOn: copyTcls) << {
 }
 
 task lineReader << {
-	File yml = new File('mysql-cluster/cluster-config-local.yml')
+	File yml = new File('scripts/mysql-cluster/local-profile.yml')
 	def ips = []
 	yml.eachLine {line ->
 		def m = line =~ /.*ip[^0-9]+(\d+\.\d+\.\d+\.\d+)[^0-9]*/

@@ -13,9 +13,9 @@ namespace eval ::myroles {
 
 proc ::myroles::runRoleActions {configDict} {
   set myip [getMyIp $configDict]
-  set nf [::confutil::getNodeConfig $configDict manageNodes $myip]
-  if {[string length $nf] > 0} {
-    ::ManageRole::run $configDict $nf $myip
+  set nodeCfg [::confutil::getNodeConfig $configDict manageNodes $myip]
+  if {[string length $nodeCfg] > 0} {
+    ::ManageRole::run $configDict $nodeCfg
   }
 
 #  if {[lsearch -exact [dict get $configDict dataNodeIps] $myip] != -1} {
