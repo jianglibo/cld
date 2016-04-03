@@ -4,7 +4,6 @@ namespace eval ::CommonUtil {
 
 }
 
-proc ::CommonUtil::getBasePath {} {
-  puts [info script]
-  file join [file dirname [info script]] ..
+proc ::CommonUtil::dictItemExists {} {
+  
 }

@@ -1,10 +1,3 @@
-#!/bin/sh
-# install-java.tcl \
-exec tclsh "$0" ${1+"$@"}
-
-set ::baseDir [file join [file dirname [info script]] ..]
-lappend auto_path $::baseDir
-
 package require AppDetecter
 
 set javaFolder /opt/java

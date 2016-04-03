@@ -1,7 +1,3 @@
-#!/bin/sh
-# install-redis.tcl \
-exec tclsh "$0" ${1+"$@"}
-
 catch {[exec systemctl list-unit-files | grep redis]} units
 
 if {[lsearch units redis.service] != -1} {

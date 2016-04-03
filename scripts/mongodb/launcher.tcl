@@ -1,6 +1,3 @@
-#!/bin/sh
-# install-redis.tcl \
-exec tclsh "$0" ${1+"$@"}
 
 set confFile /etc/mongod.conf
 

@@ -42,30 +42,32 @@ ext {
 }
 
 task copyTcls << {
-//	delete 'ttmp/*'
 	def folder = new File( 'ttmp' )
 	if( !folder.exists() ) {
 		folder.mkdirs()
 	} else {
-		delete fileTree('ttmp') {
-			include '**/*'
+		folder.listFiles().each {
+			delete it
 		}
 	}
+	def scriptsDir = "$projectDir/scripts"
+	def runFolder = System.properties['tcl.runFolder']
 	copy {
-		from("${projectDir}/scripts/${installFolder}")
-		into "ttmp/${installFolder}"
+		from("${scriptsDir}/${runFolder}")
+		into "ttmp/${runFolder}"
 		filter(FixCrLfFilter, eol: FixCrLfFilter.CrLf.newInstance('lf'))
-//		filter(ReplaceTokens, tokens: [runningDir: runningDirString, jarFile: jarFileString, profile: profile])
 	}
 
 	copy {
-		from("${projectDir}/scripts/share")
+		from("${scriptsDir}/share")
 		into "ttmp/share"
 		filter(FixCrLfFilter, eol: FixCrLfFilter.CrLf.newInstance('lf'))
 	}
 
 	copy {
-		from("${projectDir}/scripts/pkgIndex.tcl")
+		from("${projectDir}/scripts")
+		include 'launcher.tcl'
+		include 'pkgIndex.tcl'
 		into "ttmp"
 		filter(FixCrLfFilter, eol: FixCrLfFilter.CrLf.newInstance('lf'))
 	}
@@ -75,22 +77,22 @@ task copyTcls << {
 //task myTask << {}
 
 task mysqlCluster << {
-	project.ext.installFolder = 'mysql-cluster'
+	System.properties['tcl.runFolder'] = 'mysql-cluster'
 }
 
 task java << {
-	project.ext.installFolder = 'java'
+	System.properties['tcl.runFolder'] = 'java'
 }
 
 task redis << {
-	project.ext.installTcl = 'install-redis.tcl'
+	System.properties['tcl.runFolder'] = 'redis'
 }
 
 task mongodb << {
-	project.ext.installTcl = 'install-mongodb.tcl'
+	System.properties['tcl.runFolder'] = 'mongodb'
 }
 
-task install(dependsOn: copyTcls) << {
+def rrr(action) {
 	def host = System.properties.host
 
 	if (!host) {
@@ -98,14 +100,31 @@ task install(dependsOn: copyTcls) << {
 		System.exit(0)
 	}
 
-	def execFile = "${rtmpFolder}/ttmp/${installFolder}/install.tcl"
-  ssh.run {
-    session(remotes.rmt) {
-        execute "rm -rvf ${rtmpFolder}; mkdir -p ${rtmpFolder}"
-        put from: "${projectDir}/ttmp", into: rtmpFolder
-        execute "chmod -R a+x ${execFile};${execFile}"
-    }
-  }
+	def execFile = "${rtmpFolder}/ttmp/launcher.tcl"
+	def args = [:]
+	(System.properties.findAll {
+		it.key.startsWith 'tcl.'
+	}).each {
+		args.put(it.key.substring(4), it.value)
+	}
+
+	def argstr = args.inject('') {str, item ->
+		"${str} -${item.key}=${item.value}"
+	}
+
+	ssh.run {
+		session(remotes.rmt) {
+				execute "rm -rvf ${rtmpFolder}; mkdir -p ${rtmpFolder}"
+				put from: "${projectDir}/ttmp", into: rtmpFolder
+				def cmdStr = "chmod -R a+x ${execFile};${execFile} ${argstr} -action=${action}"
+				println "staring remote execute: $cmdStr"
+				execute cmdStr
+		}
+	}
+}
+
+task install(dependsOn: copyTcls) << {
+	rrr('install')
 }
 
 task lineReader << {
@@ -131,4 +150,12 @@ task lineReader << {
 			execute 'ls -lh'
 		}
 	}
+}
+
+task sp << {
+	def m = [a: 1, b:2]
+	def r = m.inject('') { str, item ->
+		"${str}${item}:"
+	}
+	println r
 }
