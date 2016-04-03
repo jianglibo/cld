@@ -1,10 +1,7 @@
-#!/bin/sh
-# install-redis.tcl \
-exec tclsh "$0" ${1+"$@"}
-
 package require yaml
 
-package require AppDetecter
+package require MysqlClusterInstaller
+package require myroles
 
 if {! [dict exists $::rawParamDict profile]} {
   puts stderr "parameter --profile doesn't exists!"
@@ -24,12 +21,15 @@ if {! ([dict get $o -errorcode] eq {NONE})} {
   exit 1
 }
 
-if {! [::AppDetecter::isInstalled ndb_mgmd]} {
-  package require MysqlClusterInstaller
-  ::MysqlClusterInstaller::install /opt/install-tmp
+switch [dict get $::rawParamDict action] {
+  install {if {[string length [::myroles::getMyIp $configDict]] > 0 } {
+              ::MysqlClusterInstaller::install /opt/install-tmp
+            } else {
+              puts stderr "host ip not exists in $configFile"
+              exit 1
+            }
+          }
+    default {
+      ::myroles::runRoleActions $configDict
+    }
 }
-
-
-package require myroles
-
-::myroles::runRoleActions $configDict

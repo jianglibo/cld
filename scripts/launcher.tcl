@@ -14,6 +14,10 @@ foreach a $::argv {
   }
 }
 
+if {! [dict exists $rawParamDict action]} {
+  dict set rawParamDict action install
+}
+
 if {[dict exists $rawParamDict runFolder] } {
   source [file join $::baseDir [dict get $rawParamDict runFolder] launcher.tcl]
 } else {

@@ -1,5 +1,7 @@
 package provide MysqlClusterInstaller 1.0
 
+package require AppDetecter
+
 namespace eval ::MysqlClusterInstaller {
 	variable rs MySQL-Cluster-gpl-7.4.10-1.el7.x86_64.rpm-bundle.tar
 	variable host http://www.fh.gov.cn
@@ -9,11 +11,19 @@ namespace eval ::MysqlClusterInstaller {
 
 proc ::MysqlClusterInstaller::install {tmpFolder} {
 
+	if {[::AppDetecter::isInstalled ndb_mgmd]} {
+	  puts stderr "******mysql cluster already installed.******"
+		exit 0
+	}
+
 	if {! [file exists $tmpFolder]} {
 		exec mkdir -p $tmpFolder
 	}
 
 	cd $tmpFolder
+
+	variable rs
+	variable host
 
 	if {! [file exists $rs]} {
 		exec curl -OL $host/$rs >& curloptout.log

@@ -1,0 +1,2 @@
+mysql-cluster:
+gradlew mysqlCluster -Dhost=xxx -Dtcl.profile=local-profile [install | config | start | stop | restart]

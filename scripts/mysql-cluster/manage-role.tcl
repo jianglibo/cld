@@ -106,15 +106,15 @@ proc ::ManageRole::run {configDict nodeCfg} {
   set thisNodeId [dict get $nodeCfg nodeIds]
   set dataDir [dict get $configDict manageNodes dataDir]
 
-  #set fid [configIniFid $dataDir $thisNodeId]
-  #createIni $configDict $nodeCfg $fid
-  #close $fid
+  set fid [configIniFid $dataDir $thisNodeId]
+  createIni $configDict $nodeCfg $fid
+  close $fid
 
-  createIni $configDict stdout
+  #createIni $configDict stdout
 
   set mapDic [list @nodeId@ $thisNodeId @datadir@ $dataDir]
 
   set execCmd [string map $mapDic $commandTpl]
-  
+
   puts $execCmd
 }

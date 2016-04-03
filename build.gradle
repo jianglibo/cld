@@ -111,16 +111,22 @@ def rrr(action) {
 	def argstr = args.inject('') {str, item ->
 		"${str} -${item.key}=${item.value}"
 	}
-
-	ssh.run {
-		session(remotes.rmt) {
-				execute "rm -rvf ${rtmpFolder}; mkdir -p ${rtmpFolder}"
-				put from: "${projectDir}/ttmp", into: rtmpFolder
-				def cmdStr = "chmod -R a+x ${execFile};${execFile} ${argstr} -action=${action}"
-				println "staring remote execute: $cmdStr"
-				execute cmdStr
+	String hosts = System.properties.host
+	println hosts
+	def ips = hosts.split(',')
+	println ips
+	ips.each {
+		remotes.rmt.setProperty('host', it)
+		ssh.run {
+			session(remotes.rmt) {
+					execute "rm -rvf ${rtmpFolder}; mkdir -p ${rtmpFolder}"
+					put from: "${projectDir}/ttmp", into: rtmpFolder
+					def cmdStr = "chmod -R a+x ${execFile};${execFile} ${argstr} -action=${action}"
+					println "staring remote execute: $cmdStr"
+					execute cmdStr
+				}
+			}
 		}
-	}
 }
 
 task install(dependsOn: copyTcls) << {
