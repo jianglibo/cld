@@ -45,8 +45,6 @@ proc ::MysqlClusterInstaller::install {tmpFolder} {
 		}
 }
 
-
-
 #catch {[exec ndb_setup.py --server_name=$sip]} msg
 #puts stdout [exec env]
 #set ndb [exec which ndb_setup.py]

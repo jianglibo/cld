@@ -133,6 +133,15 @@ task install(dependsOn: copyTcls) << {
 	rrr('install')
 }
 
+task config(dependsOn: copyTcls) << {
+	rrr('config')
+}
+
+task start(dependsOn: copyTcls) << {
+	rrr('start')
+}
+
+
 task lineReader << {
 	File yml = new File('scripts/mysql-cluster/local-profile.yml')
 	def ips = []

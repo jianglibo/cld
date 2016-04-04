@@ -12,8 +12,11 @@ namespace eval ::myroles {
 }
 
 proc ::myroles::runRoleActions {configDict} {
+
   set myip [getMyIp $configDict]
-  set nodeCfg [::confutil::getNodeConfig $configDict manageNodes $myip]
+  puts $myip
+  set nodeCfg [::confutil::getNodeConfig $configDict NDB_MGMD $myip]
+
   if {[string length $nodeCfg] > 0} {
     ::ManageRole::run $configDict $nodeCfg
   }

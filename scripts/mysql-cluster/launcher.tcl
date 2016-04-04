@@ -14,7 +14,7 @@ if {! [string match *.yml $cfgFile]} {
   set cfgFile "$cfgFile.yml"
 }
 
-catch {[set configDict [::yaml::yaml2dict -file $cfgFile]]} msg o
+catch {[set ymlDict [::yaml::yaml2dict -file $cfgFile]]} msg o
 
 if {! ([dict get $o -errorcode] eq {NONE})} {
   puts stderr $msg
@@ -22,14 +22,14 @@ if {! ([dict get $o -errorcode] eq {NONE})} {
 }
 
 switch [dict get $::rawParamDict action] {
-  install {if {[string length [::myroles::getMyIp $configDict]] > 0 } {
+  install {if {[string length [::myroles::getMyIp $ymlDict]] > 0 } {
               ::MysqlClusterInstaller::install /opt/install-tmp
             } else {
-              puts stderr "host ip not exists in $configFile"
+              puts stderr "host ip not exists in [dict get $::rawParamDict profile]"
               exit 1
             }
           }
     default {
-      ::myroles::runRoleActions $configDict
+      ::myroles::runRoleActions $ymlDict
     }
 }

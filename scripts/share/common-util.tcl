@@ -5,5 +5,5 @@ namespace eval ::CommonUtil {
 }
 
 proc ::CommonUtil::dictItemExists {} {
-  
+
 }

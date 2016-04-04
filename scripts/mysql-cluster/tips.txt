@@ -1,0 +1,6 @@
+in /etc/my.cnf
+
+use netstat -l to find listening port.
+
+config.ini配置文件最好移到固定位置，比如/etc/config.ini
+ndb_mgm启动的时候会查看/etc/my.cnf
