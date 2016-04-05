@@ -14,13 +14,22 @@ foreach a $::argv {
   }
 }
 
-if {! [dict exists $::rawParamDict action]} {
-  dict set rawParamDict action install
+puts $::rawParamDict
+
+set tmpl [list]
+
+foreach v $::argv {
+  if {[string first --f= $v] != 0} {
+    lappend tmpl $v
+  }
 }
 
-if {[dict exists $::rawParamDict runFolder] } {
-  source [file join $::baseDir [dict get $::rawParamDict runFolder] launcher.tcl]
+set ::argv $tmpl
+
+
+if {[dict exists $::rawParamDict f] } {
+  source [file join $::baseDir [dict get $::rawParamDict f]]
 } else {
-  puts stderr "paramter -runFolder does not exists!"
+  puts stderr "paramter --f does not exists!"
   exit 1
 }

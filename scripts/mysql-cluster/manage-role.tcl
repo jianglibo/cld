@@ -27,21 +27,19 @@ proc ::ManageRole::writeToDisk {configFile configLines} {
 # according to yml config, create config.ini, write to disk, change folder permission
 # execute generated command.
 proc ::ManageRole::run {ymlDict nodeYmlDict} {
-  set commandTpl "/usr/sbin/ndb_mgmd --ndb-nodeid=@NodeId@ --initial --config-dir=@DataDir@/@NodeId@/ --config-file=@DataDir@/@NodeId@/config.ini"
-
-  set configLines [::confutil::getConfigIniLines [file join $::baseDir mysql-cluster templates manage-node config.ini] $ymlDict]
+  set commandTpl "/usr/sbin/ndb_mgmd --ndb-nodeid=@NodeId@ --initial --config-dir=@DataDir@/@NodeId@/ --config-file=@ConfigFile@"
 
   set thisNodeId [dict get $nodeYmlDict NodeId]
 
   set DataDir [dict get $ymlDict NDB_MGMD DataDir]
 
-  set configFile [file join $DataDir $thisNodeId config.ini]
-
-  writeToDisk $configFile $configLines
+  if {! [file exist [file join $DataDir $thisNodeId]]} {
+    exec mkdir -p [file join $DataDir $thisNodeId]
+  }
 
   switch [dict get $::rawParamDict action] {
     start {
-      set mapDic [list @NodeId@ $thisNodeId @DataDir@ $DataDir]
+      set mapDic [list @NodeId@ $thisNodeId @DataDir@ $DataDir @ConfigFile@ [dict get $ymlDict ConfigFile path]]
       set execCmd [string map $mapDic $commandTpl]
       puts stdout "start invoking remote cmd: $execCmd"
       exec {*}$execCmd

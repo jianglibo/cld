@@ -5,7 +5,6 @@ exec tclsh "$0" ${1+"$@"}
 set ::baseDir [file join [file dirname [info script]] ..]
 lappend auto_path $::baseDir
 
-package require CommonUtil
-package require ManageRole
+package require mycnf
 
-puts [::CommonUtil::getBasePath]
+::mycnf::writeToDisk

@@ -1,2 +1,6 @@
 mysql-cluster:
-gradlew mysqlCluster -Dhost=xxx -Dtcl.profile=local-profile [install | config | start | stop | restart]
+gradlew mysqlCluster -Dhost=192.168.33.50 -Dtcl.profile=local-profile.yml [install | config | start | stop | restart]
+
+test in windows:
+
+tclsh scripts\launcher.tcl --runFolder=mysql-cluster --profile=local-profile.yml --action=config

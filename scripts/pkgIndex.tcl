@@ -16,3 +16,4 @@ package ifneeded MysqlClusterInstaller 1.0 [list source [file join $dir mysql-cl
 package ifneeded confutil 1.0 [list source [file join $dir mysql-cluster/config-util.tcl]]
 package ifneeded myroles 1.0 [list source [file join $dir mysql-cluster/my-roles.tcl]]
 package ifneeded ManageRole 1.0 [list source [file join $dir mysql-cluster/manage-role.tcl]]
+package ifneeded mycnf 1.0 [list source [file join $dir mysql-cluster/my.cnf.tcl]]
