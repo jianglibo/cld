@@ -3,6 +3,7 @@ package require yaml
 package require MysqlClusterInstaller
 package require myroles
 package require confutil
+package require CommonUtil
 
 if {! [dict exists $::rawParamDict profile]} {
   puts stderr "parameter --profile doesn't exists!"
@@ -15,12 +16,7 @@ if {! [string match *.yml $cfgFile]} {
   set cfgFile "$cfgFile.yml"
 }
 
-catch {[set ::ymlDict [::yaml::yaml2dict -file $cfgFile]]} msg o
-
-if {! ([dict get $o -errorcode] eq {NONE})} {
-  puts stderr $msg
-  exit 1
-}
+set ::ymlDict [::CommonUtil::loadYaml $cfgFile]
 
 proc normalizeYmlDict {} {
   set newnodes [list]

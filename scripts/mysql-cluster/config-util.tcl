@@ -78,18 +78,24 @@ proc ::confutil::getMyIp {} {
   return {}
 }
 
-#return
-proc ::confutil::getNodeConfigs {ip} {
-  set nodeDict [dict create NDB_MGMD [dict get $::ymlDict NDB_MGMD nodes] NDBD [dict get $::ymlDict NDBD nodes] MYSQLD [dict get $::ymlDict MYSQLD nodes] API [dict get $::ymlDict API]]
+proc ::confutil::getMyRoles {ip} {
+  set nodeDict [dict create]
 
+  foreach role {NDB_MGMD NDBD MYSQLD} {
+    dict set nodeDict $role [dict get $::ymlDict $role nodes]
+  }
+
+  dict set nodeDict API [dict get $::ymlDict API]
+
+  set mr [list]
   dict for {k nodes} $nodeDict {
     foreach n $nodes {
       if {[dict get $n HostName] eq $ip} {
-          return $n
+        lappend mr $k
       }
     }
   }
-  return {}
+  return $mr
 }
 
 proc ::confutil::getConfigIniLines {iniFile} {
@@ -103,28 +109,12 @@ proc ::confutil::parseIni {iniFile} {
     puts stderr $fid
     exit 1
   } else {
-    set FirstReach 0
-    set seq [list]
-    set dic [dict create]
-    set prevSeqName {}
-
+    set lines [list]
     while {[gets $fid line] >= 0} {
-      if {[string match \\\[*\] $line]} {
-        set FirstReach 1
-        if {[llength $seq] > 0} {
-          dict set dic $lastSeqName $seq
-          set seq [list]
-        }
-        set lastSeqName $line
-      } else {
-        if {$FirstReach} {
-          lappend seq $line
-        }
-      }
+      lappend lines $line
     }
     close $fid
-    dict set dic $lastSeqName $seq
-    variable iniDic $dic
+    variable iniDic [::CommonUtil::splitSeg $lines {\[*]}]
   }
 }
 
@@ -132,7 +122,7 @@ proc ::confutil::NDB_MGMD_DEFAULT {} {
   variable iniDic
   set tpl [dict get $iniDic {[NDB_MGMD DEFAULT]}]
   set cfg [dict get $::ymlDict NDB_MGMD_DEFAULT]
-  ::CommonUtil::replace {[NDB_MGMD DEFAULT]} $tpl $cfg
+  ::CommonUtil::replace {{} $tpl $cfg
 }
 
 proc ::confutil::NDB_MGMD {} {
@@ -145,7 +135,7 @@ proc ::confutil::NDB_MGMD {} {
 
   foreach node  [dict get $NDB_MGMD nodes] {
     dict set node DataDir $DataDir
-    set result [concat $result [::CommonUtil::replace {[NDB_MGMD]} $tpl $node]]
+    set result [concat $result [::CommonUtil::replace {} $tpl $node]]
   }
   return $result
 }
@@ -154,7 +144,7 @@ proc ::confutil::NDBD_DEFAULT {} {
   variable iniDic
   set tpl [dict get $iniDic {[NDBD DEFAULT]}]
   set cfg [dict get $::ymlDict NDBD_DEFAULT]
-  ::CommonUtil::replace {[NDBD DEFAULT]} $tpl $cfg
+  ::CommonUtil::replace {} $tpl $cfg
 }
 
 proc ::confutil::NDBD {} {
@@ -168,7 +158,7 @@ proc ::confutil::NDBD {} {
 
   foreach node  [dict get $NDBD nodes] {
     dict set node DataDir $DataDir
-    set result [concat $result [::CommonUtil::replace {[NDBD]} $tpl $node]]
+    set result [concat $result [::CommonUtil::replace {} $tpl $node]]
   }
   return $result
 }
@@ -177,7 +167,7 @@ proc ::confutil::MYSQLD_DEFAULT {} {
   variable iniDic
   set tpl [dict get $iniDic {[MYSQLD DEFAULT]}]
   set cfg [dict get $::ymlDict MYSQLD_DEFAULT]
-  ::CommonUtil::replace {[MYSQLD DEFAULT]} $tpl $cfg
+  ::CommonUtil::replace {} $tpl $cfg
 }
 
 proc ::confutil::MYSQLD {} {
@@ -199,7 +189,7 @@ proc ::confutil::MYSQLD {} {
   }
 
   foreach sub $subs {
-    set result [concat $result [::CommonUtil::replace {[MYSQLD]} $tpl $sub]]
+    set result [concat $result [::CommonUtil::replace {} $tpl $sub]]
   }
   return $result
 }
@@ -211,7 +201,7 @@ proc ::confutil::API {} {
   set result [list]
 
   foreach node  $API {
-    set result [concat $result [::CommonUtil::replace {[API]} $tpl $node]]
+    set result [concat $result [::CommonUtil::replace {} $tpl $node]]
   }
   return $result
 }

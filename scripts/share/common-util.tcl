@@ -1,5 +1,7 @@
 package provide CommonUtil 1.0
 
+package require yaml
+
 namespace eval ::CommonUtil {
 
 }
@@ -44,4 +46,13 @@ proc ::CommonUtil::splitSeg {lines matcher} {
     dict set rd $lastMatch $seg
   }
   return $rd
+}
+
+proc ::CommonUtil::loadYaml {fn} {
+  catch {[set dt [::yaml::yaml2dict -file $fn]]} msg o
+  if {! ([dict get $o -errorcode] eq {NONE})} {
+    puts stderr $msg
+    exit 1
+  }
+  return $dt
 }
