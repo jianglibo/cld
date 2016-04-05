@@ -1,11 +1,4 @@
-#!/bin/sh
-# install-redis.tcl \
-exec tclsh "$0" ${1+"$@"}
-
 package require yaml
-
-set ::baseDir [file join [file dirname [info script]] ..]
-lappend auto_path $::baseDir
 
 package require AppDetecter
 

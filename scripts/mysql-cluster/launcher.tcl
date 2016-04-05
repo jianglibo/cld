@@ -16,24 +16,7 @@ if {! [string match *.yml $cfgFile]} {
   set cfgFile "$cfgFile.yml"
 }
 
-set ::ymlDict [::CommonUtil::loadYaml $cfgFile]
-
-proc normalizeYmlDict {} {
-  set newnodes [list]
-  foreach n [dict get $::ymlDict MYSQLD nodes] {
-    foreach ins [dict get $n instances] {
-      set nn [dict create]
-      dict set nn HostName [dict get $n HostName]
-      dict for {k v} $ins {
-        dict set nn $k $v
-      }
-      lappend newnodes $nn
-    }
-  }
-  dict set ::ymlDict MYSQLD nodes $newnodes
-}
-
-normalizeYmlDict
+set ::ymlDict [::CommonUtil::normalizeYmlCfg [::CommonUtil::loadYaml $cfgFile]]
 
 puts [dict get $::ymlDict MYSQLD]
 

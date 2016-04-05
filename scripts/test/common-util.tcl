@@ -1,7 +1,8 @@
 package require tcltest 2.2
 eval ::tcltest::configure $::argv
 
-lappend auto_path [file join [file dirname [info script]] ..]
+set ::baseDir [file join [file dirname [info script]] ..]
+lappend auto_path $::baseDir
 
 package require CommonUtil
 
@@ -34,6 +35,13 @@ connect-string=nodeid=50,192.168.33.50:14500} \n]
         lappend l [llength $v]
       }
       return $l
+    # Second test; constrained
+    } -cleanup $CLEANUP -match exact -result {{[mysqld]} 5 {[ndbd]} 2}
+
+    test yml-normalize {} -constraints X -setup $SETUP -body {
+      set ymlDict [::CommonUtil::loadYaml [file join $::baseDir test fixtures local-profile.yml]]
+      set normalized [::CommonUtil::normalizeYmlCfg $ymlDict]
+      return [dict get $normalized MYSQLD]
     # Second test; constrained
     } -cleanup $CLEANUP -match exact -result {{[mysqld]} 5 {[ndbd]} 2}
 

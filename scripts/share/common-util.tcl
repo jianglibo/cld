@@ -56,3 +56,41 @@ proc ::CommonUtil::loadYaml {fn} {
   }
   return $dt
 }
+
+proc ::CommonUtil::normalizeYmlCfg {dic} {
+  set newnodes [list]
+  foreach n [dict get $dic MYSQLD nodes] {
+    foreach ins [dict get $n instances] {
+      set nn [dict create]
+      dict set nn HostName [dict get $n HostName]
+      dict for {k v} $ins {
+        dict set nn $k $v
+      }
+      lappend newnodes $nn
+    }
+  }
+  dict set dic MYSQLD nodes $newnodes
+
+  dict for {k v} $dic {
+    switch $k {
+      NDB_MGMD -
+      NDBD -
+      MYSQLD {
+        set segKeys [dict keys $v]
+
+        set ddr [dict get $v DataDir]
+        set newnodes [list]
+        foreach n [dict get $v nodes] {
+          foreach sk $segKeys {
+            if {! [expr {$sk eq {nodes}}]} {
+              dict set n $sk [dict get $v $sk]
+            }
+          }
+          lappend newnodes $n
+        }
+        dict set dic $k nodes $newnodes
+      }
+    }
+  }
+  return $dic
+}
