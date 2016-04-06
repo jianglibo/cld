@@ -14,7 +14,6 @@ package ifneeded CommonUtil 1.0 [list source [file join $dir share/common-util.t
 package ifneeded LauncherArgParser 1.0 [list source [file join $dir share/launcher-arg-parser.tcl]]
 package ifneeded MysqlClusterInstaller 1.0 [list source [file join $dir mysql-cluster/mysql-cluster-installer.tcl]]
 package ifneeded confutil 1.0 [list source [file join $dir mysql-cluster/config-util.tcl]]
-package ifneeded myroles 1.0 [list source [file join $dir mysql-cluster/my-roles.tcl]]
 package ifneeded ManageRole 1.0 [list source [file join $dir mysql-cluster/manage-role.tcl]]
 package ifneeded mycnf 1.0 [list source [file join $dir mysql-cluster/my.cnf.tcl]]
 package ifneeded confini 1.0 [list source [file join $dir mysql-cluster/config-ini.tcl]]

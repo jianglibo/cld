@@ -112,8 +112,18 @@ def rrr(action) {
 		"${str} -${item.key}=${item.value}"
 	}
 	String hosts = System.properties.host
-	println hosts
 	def ips = hosts.split(',')
+	def firstIp = ips.getAt(0)
+	def segs = firstIp.split("\\.")
+	def prefix = [] + segs.getAt(0) + segs.getAt(1) + segs.getAt(2)
+
+	ips = ips.collect {
+		if (it.split("\\.").size() == 4) {
+			return it
+		} else {
+			return (prefix + it).join(".")
+		}
+	}
 	println ips
 	ips.each {
 		remotes.rmt.setProperty('host', it)

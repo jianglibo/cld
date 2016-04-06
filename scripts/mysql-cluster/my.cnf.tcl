@@ -18,8 +18,11 @@ namespace eval ::mycnf {
   }
 }
 
-proc ::mycnf::writeToDisk {dest} {
-#  set iniFile [dict get $::ymlDict ConfigFile path]
+proc ::mycnf::writeToDisk {dest {needSubstitute 0}} {
+
+  if {$needSubstitute} {
+    substitute
+  }
   set configDir [file dirname $dest]
   variable mycnfDic
 
@@ -67,29 +70,10 @@ proc ::mycnf::substitute {} {
           variable mycnfDic [::CommonUtil::replaceItem $mycnfDic $k $kvDict]
         }
       }
+      {[ndb_mgmd]} {
+          set kvDict [dict create config-file  [dict get $::ymlDict ConfigFile path]]
+          variable mycnfDic [::CommonUtil::replaceItem $mycnfDic $k $kvDict]
+      }
     }
   }
-}
-
-
-proc ::mycnf::prepareDict {myip} {
-  set sublines [list]
-
-  foreach line $tpl {
-
-  }
-
-  set subDict [dict create]
-  set nodesCfg [dict get $::ymlDict NDB_MGMD nodes]
-  set connectString [list]
-  foreach node $nodesCfg {
-    set hn [dict get $node HostName]
-    if {$hn eq $myip} {
-      set NodeId [dict get $node NodeId]
-    }
-    lappend connectString "$hn:[dict get $node PortNumber]"
-  }
-  dict set subDict connect-string "nodeid=$NodeId,[join $connectString ,]"
-  dict set subDict config-file [dict get $::ymlDict ConfigFile path]
-  return $subDict
 }

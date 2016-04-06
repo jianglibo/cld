@@ -1,8 +1,6 @@
 package require yaml
 
 package require MysqlClusterInstaller
-package require myroles
-package require confutil
 package require CommonUtil
 
 if {! [dict exists $::rawParamDict profile]} {
@@ -16,19 +14,35 @@ if {! [string match *.yml $cfgFile]} {
   set cfgFile "$cfgFile.yml"
 }
 
-set ::ymlDict [::CommonUtil::normalizeYmlCfg [::CommonUtil::loadYaml $cfgFile]]
+set ::ymlDict [::CommonUtil::loadNormalizedYmlDic $cfgFile]
+package require confutil
+package require mycnf
+package require confini
 
-puts [dict get $::ymlDict MYSQLD]
+set myroles [::confutil::getMyRoles]
+
+if {! [llength $myroles]} {
+  puts stderr "host ip not exists in [dict get $::rawParamDict profile]"
+  exit 1
+}
+
+dict for {k v} $::ymlDict {
+  if {[dict exists $v DataDir]} {
+    catch {exec mkdir -p [dict get $v DataDir]} msg o
+    puts stdout $msg
+  }
+}
 
 switch [dict get $::rawParamDict action] {
-  install {if {[string length [::confutil::getMyIp]] > 0 } {
-              ::MysqlClusterInstaller::install /opt/install-tmp
-            } else {
-              puts stderr "host ip not exists in [dict get $::rawParamDict profile]"
-              exit 1
-            }
-          }
-    default {
-      ::myroles::runRoleActions
-    }
+  install {
+    ::MysqlClusterInstaller::install /opt/install-tmp
+  }
+  config {
+    # write my.cnf file. always need.
+    ::mycnf::writeToDisk /etc/my.cnf 1
+    ::confini::writeToDisk [dict get $::ymlDict ConfigFile path] 1
+  }
+  default {
+    ::ManageRole::run
+  }
 }

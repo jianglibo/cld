@@ -44,11 +44,3 @@ proc ::MysqlClusterInstaller::install {tmpFolder} {
 			}
 		}
 }
-
-#catch {[exec ndb_setup.py --server_name=$sip]} msg
-#puts stdout [exec env]
-#set ndb [exec which ndb_setup.py]
-#exec env PYTHONPATH=/usr/bin/python
-#catch {[exec $ndb -N $sip]} msg
-#puts stdout "please ssh in to $sip, and run $ndb -N $sip"
-#puts stdout $msg

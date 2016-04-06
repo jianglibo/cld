@@ -17,8 +17,10 @@ namespace eval ::confini {
 }
 
 
-proc ::confini::writeToDisk {dest} {
-#  set iniFile [dict get $::ymlDict ConfigFile path]
+proc ::confini::writeToDisk {dest {needSubstitute 0}} {
+  if {$needSubstitute} {
+    substitute
+  }
   set configDir [file dirname $dest]
   variable iniDic
 
