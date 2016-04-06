@@ -10,20 +10,27 @@ proc ::CommonUtil::dictItemExists {} {
 
 }
 
-proc ::CommonUtil::replace {header tpl cfg} {
-  set keys [dict keys $cfg]
-  set result [list $header]
+proc ::CommonUtil::replace {lines kvDic} {
+  set keys [dict keys $kvDic]
+  set result [list]
 
-  foreach line $tpl {
+  foreach line $lines {
     foreach k $keys {
       if {[string first "$k=" $line] == 0} {
-        set line [string replace $line [string length "$k="] end [dict get $cfg $k]]
+        set line [string replace $line [string length "$k="] end [dict get $kvDic $k]]
         break
       }
     }
     lappend result $line
   }
   return $result
+}
+
+proc ::CommonUtil::replaceItem {contentDic contentKey kvDic} {
+  set lines [dict get $contentDic $contentKey]
+  set lines [replace $lines $kvDic]
+  dict set contentDic $contentKey $lines
+  return $contentDic
 }
 
 proc ::CommonUtil::splitSeg {lines matcher} {
@@ -46,6 +53,24 @@ proc ::CommonUtil::splitSeg {lines matcher} {
     dict set rd $lastMatch $seg
   }
   return $rd
+}
+
+proc ::CommonUtil::getMgmHosts {ymlDict} {
+  set hosts [list]
+  dict for {k v} $ymlDict {
+    switch $k {
+      {NDB_MGMD} {
+        foreach n [dict get $v nodes] {
+          lappend hosts "[dict get $n HostName]:[dict get $n PortNumber]"
+        }
+      }
+    }
+  }
+  return $hosts
+}
+
+proc ::CommonUtil::loadNormalizedYmlDic {fn} {
+  ::CommonUtil::normalizeYmlCfg [::CommonUtil::loadYaml $fn]
 }
 
 proc ::CommonUtil::loadYaml {fn} {

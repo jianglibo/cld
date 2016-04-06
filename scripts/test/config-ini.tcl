@@ -38,13 +38,12 @@ namespace eval ::example::test {
     } -cleanup $CLEANUP -match exact -result {{[NDB_MGMD DEFAULT]} {[NDB_MGMD]} {[NDBD DEFAULT]} {[NDBD]} {[MYSQLD DEFAULT]} {[MYSQLD]} {[API]}}
 
     test after-substituted-content {} -constraints X -setup $SETUP -body {
-      puts [dict get $::confini::iniDic {[API]}]
       set ll [list]
       dict for {k v} $::confini::iniDic {
         lappend ll [llength $v]
       }
       return $ll
-    } -cleanup $CLEANUP -match exact -result {9 14 33 16 5 28 8}
+    } -cleanup $CLEANUP -match exact -result {8 12 32 14 4 24 6}
 
     ::confini::writeToDisk [file join $::baseDir test fixturesout config.ini]
 

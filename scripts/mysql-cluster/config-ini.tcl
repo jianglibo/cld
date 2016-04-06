@@ -51,7 +51,7 @@ proc ::confini::substitute {} {
       {[MYSQLD DEFAULT]} {
         set ymlKey [string map {{ } _} [string range $k 1 end-1]]
         set dic [dict get $::ymlDict $ymlKey]
-        dict set tmpDic $k [::CommonUtil::replace {} $v $dic]
+        dict set tmpDic $k [::CommonUtil::replace $v $dic]
       }
       {[NDB_MGMD]} -
       {[NDBD]} -
@@ -60,7 +60,7 @@ proc ::confini::substitute {} {
         set nodes [dict get $::ymlDict $ymlKey nodes]
         set tmpList [list]
         foreach ndic $nodes {
-          set tmpList [concat $tmpList [::CommonUtil::replace {} $v $ndic]]
+          set tmpList [concat $tmpList [::CommonUtil::replace $v $ndic]]
         }
         dict set tmpDic $k $tmpList
       }
@@ -69,7 +69,7 @@ proc ::confini::substitute {} {
         set nodes [dict get $::ymlDict $ymlKey]
         set tmpList [list]
         foreach ndic $nodes {
-          set tmpList [concat $tmpList [::CommonUtil::replace {} $v $ndic]]
+          set tmpList [concat $tmpList [::CommonUtil::replace $v $ndic]]
         }
         dict set tmpDic $k $tmpList
       }

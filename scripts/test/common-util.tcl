@@ -39,11 +39,17 @@ connect-string=nodeid=50,192.168.33.50:14500} \n]
     } -cleanup $CLEANUP -match exact -result {{[mysqld]} 5 {[ndbd]} 2}
 
     test yml-normalize {} -constraints X -setup $SETUP -body {
-      set ymlDict [::CommonUtil::loadYaml [file join $::baseDir test fixtures local-profile.yml]]
-      set normalized [::CommonUtil::normalizeYmlCfg $ymlDict]
-      return [dict get $normalized MYSQLD]
+      set normalized [::CommonUtil::loadNormalizedYmlDic [file join $::baseDir test fixtures local-profile.yml]]
+
+      dict get [lindex [dict get $normalized MYSQLD nodes] 0] DataDir
     # Second test; constrained
-    } -cleanup $CLEANUP -match exact -result {{[mysqld]} 5 {[ndbd]} 2}
+    } -cleanup $CLEANUP -match exact -result {/opt/mysql-cluster-data}
+
+    test getMgmHosts {} -constraints X -setup $SETUP -body {
+      set ymlDict [::CommonUtil::loadNormalizedYmlDic [file join $::baseDir test fixtures local-profile.yml]]
+      return [::CommonUtil::getMgmHosts $ymlDict]
+    # Second test; constrained
+    } -cleanup $CLEANUP -match exact -result {192.168.33.50:41500 192.168.33.51:41500}
 
     # match regexp, glob, exact
     cleanupTests
