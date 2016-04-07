@@ -9,7 +9,7 @@ package require CommonUtil
 package require confini
 
 namespace eval ::example::test {
-    set ::ymlDict [::CommonUtil::normalizeYmlCfg [::CommonUtil::loadYaml [file join $::baseDir test fixtures local-profile.yml]]]
+    set ::ymlDict [::CommonUtil::normalizeYmlCfg [::CommonUtil::loadYaml [file join $::baseDir mysql-cluster local-profile.yml]]]
 
     namespace import ::tcltest::*
     testConstraint X [expr {1}]
@@ -21,7 +21,7 @@ namespace eval ::example::test {
 
     test has-split-to-dict {} -constraints X -setup $SETUP -body {
       return [dict keys $::confini::iniDic]
-    } -cleanup $CLEANUP -match exact -result {{[NDB_MGMD DEFAULT]} {[NDB_MGMD]} {[NDBD DEFAULT]} {[NDBD]} {[MYSQLD DEFAULT]} {[MYSQLD]} {[API]}}
+    } -cleanup $CLEANUP -match exact -result {{[NDB_MGMD DEFAULT]} {[NDB_MGMD]} {[NDBD DEFAULT]} {[NDBD]} {[MYSQLD DEFAULT]} {[MYSQLD]}}
 
     test before-substituted-content {} -constraints X -setup $SETUP -body {
       set ll [list]
@@ -29,13 +29,13 @@ namespace eval ::example::test {
         lappend ll [llength $v]
       }
       return $ll
-    } -cleanup $CLEANUP -match exact -result {8 6 32 7 4 6 3}
+    } -cleanup $CLEANUP -match exact -result {8 6 32 7 4 14}
 
     ::confini::substitute
 
     test has-substituted {} -constraints X -setup $SETUP -body {
       return [dict keys $::confini::iniDic]
-    } -cleanup $CLEANUP -match exact -result {{[NDB_MGMD DEFAULT]} {[NDB_MGMD]} {[NDBD DEFAULT]} {[NDBD]} {[MYSQLD DEFAULT]} {[MYSQLD]} {[API]}}
+    } -cleanup $CLEANUP -match exact -result {{[NDB_MGMD DEFAULT]} {[NDB_MGMD]} {[NDBD DEFAULT]} {[NDBD]} {[MYSQLD DEFAULT]} {[MYSQLD]}}
 
     test after-substituted-content {} -constraints X -setup $SETUP -body {
       set ll [list]
@@ -43,7 +43,7 @@ namespace eval ::example::test {
         lappend ll [llength $v]
       }
       return $ll
-    } -cleanup $CLEANUP -match exact -result {8 12 32 14 4 24 6}
+    } -cleanup $CLEANUP -match exact -result {8 12 32 14 4 56}
 
     ::confini::writeToDisk [file join $::baseDir test fixturesout config.ini]
 

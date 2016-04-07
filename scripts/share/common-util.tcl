@@ -84,10 +84,13 @@ proc ::CommonUtil::loadYaml {fn} {
 
 proc ::CommonUtil::normalizeYmlCfg {dic} {
   set newnodes [list]
-  foreach n [dict get $dic MYSQLD nodes] {
+  set mysqldSeg [dict get $dic MYSQLD]
+  set baseDataDir [dict get $mysqldSeg DataDir]
+  foreach n [dict get $mysqldSeg nodes] {
     foreach ins [dict get $n instances] {
       set nn [dict create]
       dict set nn HostName [dict get $n HostName]
+      dict set nn DataDir "${baseDataDir}/[dict get $ins NodeId]"
       dict for {k v} $ins {
         dict set nn $k $v
       }

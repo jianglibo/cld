@@ -19,6 +19,8 @@ package require confutil
 package require mycnf
 package require confini
 package require ManageRole
+package require MysqldRole
+package require NdbdRole
 
 set myroles [::confutil::getMyRoles]
 
@@ -28,17 +30,10 @@ if {! [llength $myroles]} {
 }
 
 dict for {k v} $::ymlDict {
-  if {[dict exists $v DataDir]} {
+  set hasRole [expr [lsearch $myroles $k] != -1]
+  if {$hasRole && [dict exists $v DataDir]} {
     catch {exec mkdir -p [dict get $v DataDir]} msg o
   }
-
-#  if {[dict exists $v nodes]} {
-#      foreach n [dict get $v nodes] {
-#          if {[dict exists $n DataDir]} {
-#            catch {exec mkdir -p [dict get $n DataDir]} msg o
-#          }
-#      }
-#  }
 }
 
 switch [dict get $::rawParamDict action] {
@@ -48,13 +43,31 @@ switch [dict get $::rawParamDict action] {
   config {
     # write my.cnf file. always need.
     ::mycnf::writeToDisk /etc/my.cnf 1
-    ::confini::writeToDisk [dict get $::ymlDict ConfigFile path] 1
+    set cf [dict get $::ymlDict NDB_MGMD_DEFAULT config-file]
+    ::confini::writeToDisk $cf 1
   }
-  default {
+  mgmstart {
     if {[lsearch -exact $myroles NDB_MGMD] != -1} {
       ::ManageRole::run
     } else {
       puts stdout "not a NDB_MGMD node, skipping"
     }
+  }
+  mysqldstart {
+    if {[lsearch -exact $myroles MYSQLD] != -1} {
+      ::MysqldRole::run
+    } else {
+      puts stdout "not a MYSQLD node, skipping"
+    }
+  }
+  ndbdstart {
+    if {[lsearch -exact $myroles NDBD] != -1} {
+      ::NdbdRole::run
+    } else {
+      puts stdout "not a NDBD node, skipping"
+    }
+  }
+  default {
+
   }
 }

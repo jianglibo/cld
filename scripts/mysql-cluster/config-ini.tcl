@@ -36,6 +36,7 @@ proc ::confini::writeToDisk {dest {needSubstitute 0}} {
       foreach line $v {
           puts $fid $line
       }
+      puts $fid \n
     }
     close $fid
   }
@@ -62,7 +63,8 @@ proc ::confini::substitute {} {
         set nodes [dict get $::ymlDict $ymlKey nodes]
         set tmpList [list]
         foreach ndic $nodes {
-          set tmpList [concat $tmpList [::CommonUtil::replace $v $ndic]]
+          set afterReplaced [concat [::CommonUtil::replace $v $ndic] \n]
+          set tmpList [concat $tmpList $afterReplaced]
         }
         dict set tmpDic $k $tmpList
       }

@@ -54,6 +54,20 @@ proc ::confutil::getNodeId {role} {
   }
 }
 
+proc ::confutil::getNodeIds {role} {
+  variable thisMachineIp
+  set segd [dict get $::ymlDict $role]
+  set nodeids [list]
+  if {[dict exists $segd nodes]} {
+    foreach n [dict get $segd nodes] {
+      if {[dict get $n HostName] eq $thisMachineIp} {
+        lappend nodeids [dict get $n NodeId]
+      }
+    }
+  }
+  return $nodeids
+}
+
 proc ::confutil::getNodeYml {role} {
   variable thisMachineIp
   set segd [dict get $::ymlDict $role]
@@ -67,6 +81,20 @@ proc ::confutil::getNodeYml {role} {
   }
 }
 
+proc ::confutil::getNodeYmls {role} {
+  variable thisMachineIp
+  set segd [dict get $::ymlDict $role]
+  set nodeYmls [list]
+  if {[dict exists $segd nodes]} {
+    foreach n [dict get $segd nodes] {
+      if {[dict get $n HostName] eq $thisMachineIp} {
+        lappend nodeYmls $n
+      }
+    }
+  }
+  return $nodeYmls
+}
+
 proc ::confutil::getMyRoles {} {
   variable thisMachineIp
 
@@ -76,7 +104,7 @@ proc ::confutil::getMyRoles {} {
     dict set nodeDict $role [dict get $::ymlDict $role nodes]
   }
 
-  dict set nodeDict API [dict get $::ymlDict API]
+#  dict set nodeDict API [dict get $::ymlDict API]
 
   set mr [list]
 

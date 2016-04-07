@@ -93,6 +93,13 @@ task mongodb << {
 }
 
 def rrr(action) {
+	if (!action) {
+		action = System.properties["tcl.action"]
+		if (!action) {
+			println "please add -Dtcl.action=mgmstart|mysqldstart|ndbdstart"
+			System.exit(0)
+		}
+	}
 	def host = System.properties.host
 
 	if (!host) {
@@ -129,7 +136,7 @@ def rrr(action) {
 		remotes.rmt.setProperty('host', it)
 		ssh.run {
 			session(remotes.rmt) {
-					execute "rm -rvf ${rtmpFolder}; mkdir -p ${rtmpFolder}"
+					execute "rm -rvf ${rtmpFolder}  >/dev/null; mkdir -p ${rtmpFolder}"
 					put from: "${projectDir}/ttmp", into: rtmpFolder
 					def cmdStr = "chmod -R a+x ${execFile};${execFile} ${argstr} -action=${action}"
 					println "staring remote execute: $cmdStr"
@@ -148,7 +155,7 @@ task config(dependsOn: copyTcls) << {
 }
 
 task start(dependsOn: copyTcls) << {
-	rrr('start')
+	rrr('')
 }
 
 

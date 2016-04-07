@@ -6,7 +6,7 @@ lappend auto_path $::baseDir
 
 package require CommonUtil
 
-set ::ymlDict [::CommonUtil::loadYaml [file join $::baseDir test fixtures local-profile.yml]]
+set ::ymlDict [::CommonUtil::normalizeYmlCfg [::CommonUtil::loadYaml [file join $::baseDir mysql-cluster local-profile.yml]]]
 
 package require confutil
 

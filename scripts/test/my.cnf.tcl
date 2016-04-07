@@ -7,7 +7,7 @@ lappend auto_path $::baseDir
 
 package require CommonUtil
 
-set ::ymlDict [::CommonUtil::normalizeYmlCfg [::CommonUtil::loadYaml [file join $::baseDir test fixtures local-profile.yml]]]
+set ::ymlDict [::CommonUtil::normalizeYmlCfg [::CommonUtil::loadYaml [file join $::baseDir mysql-cluster local-profile.yml]]]
 
 package require mycnf
 
@@ -31,7 +31,7 @@ namespace eval ::example::test {
         lappend ll [llength $v]
       }
       return $ll
-    } -cleanup $CLEANUP -match exact -result {36 4 4 2}
+    } -cleanup $CLEANUP -match exact -result {36 4 4 3}
 
     ::mycnf::substitute
 
@@ -70,6 +70,10 @@ namespace eval ::example::test {
       }
 
     } -cleanup $CLEANUP -match exact -result {connect-string=nodeid=b,192.168.33.50:14500}
+
+    test mgm-configfile-configdir {} -constraints X -setup $SETUP -body {
+      return [dict get $::mycnf::mycnfDic {[ndb_mgmd]}]
+    } -cleanup $CLEANUP -match exact -result {{[ndb_mgmd]} config-file=/opt/mysql-cluster-mgm/config.ini config-dir=/opt/mysql-cluster-mgm}
 
     # match regexp, glob, exact
     cleanupTests

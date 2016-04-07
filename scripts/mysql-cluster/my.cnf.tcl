@@ -82,7 +82,8 @@ proc ::mycnf::substitute {} {
         }
       }
       {[ndb_mgmd]} {
-          set kvDict [dict create config-file  [dict get $::ymlDict ConfigFile path]]
+          set kvDict [dict get $::ymlDict NDB_MGMD_DEFAULT]
+          puts $kvDict
           variable mycnfDic [::CommonUtil::replaceItem $mycnfDic $k $kvDict]
       }
     }
