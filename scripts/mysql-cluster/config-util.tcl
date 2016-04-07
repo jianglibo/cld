@@ -54,6 +54,19 @@ proc ::confutil::getNodeId {role} {
   }
 }
 
+proc ::confutil::getNodeYml {role} {
+  variable thisMachineIp
+  set segd [dict get $::ymlDict $role]
+  if {[dict exists $segd nodes]} {
+    # we only get one nodid.
+    foreach n [dict get $segd nodes] {
+      if {[dict get $n HostName] eq $thisMachineIp} {
+        return $n
+      }
+    }
+  }
+}
+
 proc ::confutil::getMyRoles {} {
   variable thisMachineIp
 

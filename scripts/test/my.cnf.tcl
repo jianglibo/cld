@@ -31,7 +31,7 @@ namespace eval ::example::test {
         lappend ll [llength $v]
       }
       return $ll
-    } -cleanup $CLEANUP -match exact -result {12 4 4 2}
+    } -cleanup $CLEANUP -match exact -result {36 4 4 2}
 
     ::mycnf::substitute
 

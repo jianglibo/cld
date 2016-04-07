@@ -52,9 +52,20 @@ proc ::mycnf::substitute {} {
 
   set mgmHosts [join [::CommonUtil::getMgmHosts $::ymlDict] ,]
   dict for {k v} $mycnfDic {
+    # this section in none sense. because we will run multiple instances in same machine.
     switch $k {
       {[mysqld]} {
-
+        set nodeYml [::confutil::getNodeYml {MYSQLD}]
+        if {[string length $nodeYml] > 0} {
+          set nodeid [dict get $nodeYml NodeId]
+          set DataDir [dict get $nodeYml DataDir]
+          if {[string length $nodeid] > 0} {
+            catch {exec mkdir -p $DataDir} msg o
+            catch {exec chown -R mysql:mysql $DataDir}
+            set kvDict [dict create {ndb-connectstring}  "nodeid=$nodeid,$mgmHosts" datadir $DataDir]
+            variable mycnfDic [::CommonUtil::replaceItem $mycnfDic $k $kvDict]
+          }
+        }
       }
       {[ndbd]} {
         set nodeid [::confutil::getNodeId {NDBD}]

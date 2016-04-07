@@ -103,12 +103,13 @@ proc ::CommonUtil::normalizeYmlCfg {dic} {
       MYSQLD {
         set segKeys [dict keys $v]
 
-        set ddr [dict get $v DataDir]
         set newnodes [list]
         foreach n [dict get $v nodes] {
           foreach sk $segKeys {
             if {! [expr {$sk eq {nodes}}]} {
-              dict set n $sk [dict get $v $sk]
+              if {! [dict exists $n $sk]} {
+                dict set n $sk [dict get $v $sk]
+              }
             }
           }
           lappend newnodes $n

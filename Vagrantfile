@@ -8,7 +8,11 @@
 Vagrant.configure(2) do |config|
 
   #config.vm.provider "hyperv"
-  config.vm.provider "virtualbox"
+
+  config.vm.provider "virtualbox" do |v|
+    v.memory = 512
+  end
+
   # The most common configuration options are documented and commented below.
   # For a complete reference, please see the online documentation at
   # https://docs.vagrantup.com.
@@ -72,7 +76,7 @@ Vagrant.configure(2) do |config|
   # documentation for more information about their specific syntax and use.
 
   config.vm.provision "shell", inline: <<-SHELL
-	yum install -y tcl tcllib dos2unix
+	yum install -y tcl tcllib dos2unix cpan
   SHELL
   config.vm.define "config-server" do |configServer|
 	  configServer.vm.network "private_network", ip: "192.168.33.50"

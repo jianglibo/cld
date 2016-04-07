@@ -18,6 +18,7 @@ set ::ymlDict [::CommonUtil::loadNormalizedYmlDic $cfgFile]
 package require confutil
 package require mycnf
 package require confini
+package require ManageRole
 
 set myroles [::confutil::getMyRoles]
 
@@ -29,8 +30,15 @@ if {! [llength $myroles]} {
 dict for {k v} $::ymlDict {
   if {[dict exists $v DataDir]} {
     catch {exec mkdir -p [dict get $v DataDir]} msg o
-    puts stdout $msg
   }
+
+#  if {[dict exists $v nodes]} {
+#      foreach n [dict get $v nodes] {
+#          if {[dict exists $n DataDir]} {
+#            catch {exec mkdir -p [dict get $n DataDir]} msg o
+#          }
+#      }
+#  }
 }
 
 switch [dict get $::rawParamDict action] {
@@ -43,6 +51,10 @@ switch [dict get $::rawParamDict action] {
     ::confini::writeToDisk [dict get $::ymlDict ConfigFile path] 1
   }
   default {
-    ::ManageRole::run
+    if {[lsearch -exact $myroles NDB_MGMD] != -1} {
+      ::ManageRole::run
+    } else {
+      puts stdout "not a NDB_MGMD node, skipping"
+    }
   }
 }

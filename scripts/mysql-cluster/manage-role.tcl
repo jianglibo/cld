@@ -44,7 +44,7 @@ proc ::ManageRole::run {} {
   switch [dict get $::rawParamDict action] {
     start {
       set kvDic [list @NodeId@ $thisNodeId @DataDir@ $DataDir @ConfigFile@ [dict get $::ymlDict ConfigFile path]]
-      set execCmd [string map $mapDic $commandTpl]
+      set execCmd [string map $kvDic $commandTpl]
       puts stdout "start invoking remote cmd: $execCmd"
       exec {*}$execCmd
     }
