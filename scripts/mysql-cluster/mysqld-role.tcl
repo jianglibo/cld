@@ -30,7 +30,8 @@ proc ::MysqldRole::run {} {
           puts stdout $msg
         }
 
-        set execCmd "mysqld_safe --user=mysql --ndb-nodeid=[dict get $nodeYml NodeId] --datadir=$dd --port=[dict get $nodeYml Port] &"
+        set execCmd "mysqld_safe --user=mysql --ndb-nodeid=[dict get $nodeYml NodeId] --datadir=$dd --port=[dict get $nodeYml Port] >/dev/null &"
+        puts stdout "starting mysql: $execCmd"
         exec {*}$execCmd
       }
     }

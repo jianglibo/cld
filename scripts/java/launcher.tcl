@@ -32,6 +32,9 @@ exec tar -zxf $jdkFile
 
 exec alternatives --install "/usr/bin/java" "java" "$javaFolder/$jdkFolder/bin/java" 1
 exec alternatives --install "/usr/bin/javac" "javac" "$javaFolder/$jdkFolder/bin/javac" 1
+exec alternatives --install "/usr/bin/jar" "jar" "$javaFolder/$jdkFolder/bin/jar" 1
+exec alternatives --install "/usr/bin/javah" "javah" "$javaFolder/$jdkFolder/bin/javah" 1
+exec alternatives --install "/usr/bin/javadoc" "javadoc" "$javaFolder/$jdkFolder/bin/javadoc" 1
 
 puts stdout "checking java install..."
 

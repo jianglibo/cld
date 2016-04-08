@@ -80,29 +80,22 @@ Vagrant.configure(2) do |config|
   SHELL
   config.vm.define "config-server" do |configServer|
 	  configServer.vm.network "private_network", ip: "192.168.33.50"
-#    configServer.vm.provision "shell", path: "install-redis-systemd.tcl"
-#    configServer.vm.provision "shell", path: "install-java.tcl"
-#    configServer.vm.provision "shell", path: "install-mysql.tcl"
   end
 
   config.vm.define "eureka-server1" do |eurekaServer1|
 	  eurekaServer1.vm.network "private_network", ip: "192.168.33.51"
-#    eurekaServer1.vm.provision "shell", path: "install-java.tcl"
   end
 
   config.vm.define "eureka-server2" do |eurekaServer2|
 	  eurekaServer2.vm.network "private_network", ip: "192.168.33.52"
-#    eurekaServer2.vm.provision "shell", path: "install-java.tcl"
   end
 
-#  config.vm.define "mongodb" do |mongodb|
-#	  mongodb.vm.network "private_network", ip: "192.168.33.53"
-#    mongodb.vm.provision "shell", path: "install-mongodb.tcl"
+#  config.vm.define "mysql-cluster" do |mcluster|
+#	  mcluster.vm.network "private_network", ip: "192.168.33.53"
 #  end
 
-  config.vm.define "mysql-cluster" do |mcluster|
-	  mcluster.vm.network "private_network", ip: "192.168.33.53"
-#    mcluster.vm.provision "shell", path: "install-mysql-cluster.tcl"
+  config.vm.define "mongodb" do |mongodb|
+	  mongodb.vm.network "private_network", ip: "192.168.33.53"
   end
 
   # can not disable this interface.because vagrant use it.
