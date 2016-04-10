@@ -16,11 +16,61 @@ dependencyManagement {
     imports { mavenBom "org.springframework.cloud:spring-cloud-starter-parent:${scsp}" }
 }
 
-dependencies { 
+buildscript {
+    repositories {
+        mavenLocal()
+        mavenCentral()
+    }
+
+    dependencies {
+        classpath 'org.jooq:jooq-codegen:3.7.3'
+        classpath 'com.h2database:h2:1.4.177'
+	    classpath "mysql:mysql-connector-java:5.1.38"
+    }
+}
+
+dependencies {
     compile 'org.springframework.cloud:spring-cloud-starter-config'
     compile 'org.springframework.cloud:spring-cloud-starter-eureka'
     compile 'org.springframework.boot:spring-boot-starter-web'
+    compile 'org.jooq:jooq:3.7.3'
     testCompile("org.springframework.boot:spring-boot-starter-test")
 }
 
 bootRun { systemProperties System.properties }
+
+task cg << {
+
+    // Use your favourite XML builder to construct the code generation configuration file
+    // ----------------------------------------------------------------------------------
+    def writer = new StringWriter()
+    def xml = new groovy.xml.MarkupBuilder(writer)
+            .configuration('xmlns': 'http://www.jooq.org/xsd/jooq-codegen-3.7.0.xsd') {
+        jdbc() {
+            driver('com.mysql.jdbc.Driver')
+//            url('jdbc:mysql:loadbalance://192.168.33.50:41510,192.168.33.50:41511,192.168.33.51:41510,192.168.33.51:41511/test]')
+            url('jdbc:mysql://192.168.33.53:3306/firstdb')
+            user('firstuser')
+            password('newPass%123')
+        }
+        generator() {
+            database() {
+            }
+            generate() {
+            }
+            target() {
+                packageName('com.mymock.db')
+                directory('src/main/java')
+            }
+        }
+    }
+
+    // Run the code generator
+    // ----------------------
+    org.jooq.util.GenerationTool.main(
+        javax.xml.bind.JAXB.unmarshal(
+            new StringReader(writer.toString()),
+            org.jooq.util.jaxb.Configuration.class
+        )
+    )
+}

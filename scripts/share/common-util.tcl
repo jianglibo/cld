@@ -82,6 +82,30 @@ proc ::CommonUtil::loadYaml {fn} {
   return $dt
 }
 
+proc ::CommonUtil::killByName {pname} {
+  catch {set psResult [exec ps -A | grep $pname]} msg o
+  if {[dict get $o -code] != 0} {
+    return;
+  }
+  if {[string length $psResult] > 0} {
+    set psResult [split $psResult  \n]
+  }
+
+
+  foreach p $psResult {
+    set pid [string trim [lindex $p 0]]
+    if {[string length $pid] > 0} {
+      puts stdout $pid
+      catch {exec kill -s 9 $pid} msg o
+    }
+  }
+}
+
+proc ::CommonUtil::killYum {} {
+  killByName yum
+  catch {exec rm /var/run/yum.pid} msg o
+}
+
 proc ::CommonUtil::normalizeYmlCfg {dic} {
   set newnodes [list]
   set mysqldSeg [dict get $dic MYSQLD]

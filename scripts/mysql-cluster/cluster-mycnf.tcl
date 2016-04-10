@@ -1,10 +1,10 @@
-package provide mycnf 1.0
+package provide ClusterMycnf 1.0
 
 package require CommonUtil
 
 package require confutil
 
-namespace eval ::mycnf {
+namespace eval ::ClusterMycnf {
   if {[catch {open [file join $::baseDir mysql-cluster templates my.cnf]} fid o]} {
     puts stderr $fid
     exit 1
@@ -18,7 +18,7 @@ namespace eval ::mycnf {
   }
 }
 
-proc ::mycnf::writeToDisk {dest {needSubstitute 0}} {
+proc ::ClusterMycnf::writeToDisk {dest {needSubstitute 0}} {
 
   if {$needSubstitute} {
     substitute
@@ -45,7 +45,7 @@ proc ::mycnf::writeToDisk {dest {needSubstitute 0}} {
 
 
 # {[mysqld]} {[ndbd]} {[ndb_mgm]} {[ndb_mgmd]}
-proc ::mycnf::substitute {} {
+proc ::ClusterMycnf::substitute {} {
   variable mycnfDic
 
   set roles [::confutil::getMyRoles]

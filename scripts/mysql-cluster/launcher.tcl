@@ -16,7 +16,7 @@ if {! [string match *.yml $cfgFile]} {
 
 set ::ymlDict [::CommonUtil::loadNormalizedYmlDic $cfgFile]
 package require confutil
-package require mycnf
+package require ClusterMycnf
 package require confini
 package require ManageRole
 package require MysqldRole
@@ -42,7 +42,7 @@ switch [dict get $::rawParamDict action] {
   }
   config {
     # write my.cnf file. always need.
-    ::mycnf::writeToDisk /etc/my.cnf 1
+    ::ClusterMycnf::writeToDisk /etc/my.cnf 1
     set cf [dict get $::ymlDict NDB_MGMD_DEFAULT config-file]
     ::confini::writeToDisk $cf 1
   }

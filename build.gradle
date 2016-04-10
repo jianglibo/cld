@@ -17,7 +17,7 @@ buildscript {
     dependencies {
         classpath("org.springframework.boot:spring-boot-gradle-plugin:${sbv}")
         classpath "io.spring.gradle:dependency-management-plugin:${dmp}"
-		classpath("org.hidetake:gradle-ssh-plugin:1.1.3")
+				classpath("org.hidetake:gradle-ssh-plugin:1.1.3")
     }
 }
 
@@ -86,6 +86,10 @@ task java << {
 
 task redis << {
 	System.properties['tcl.runFolder'] = 'redis'
+}
+
+task mysql << {
+	System.properties['tcl.runFolder'] = 'mysql'
 }
 
 task mongodb << {
@@ -157,6 +161,11 @@ task config(dependsOn: copyTcls) << {
 task start(dependsOn: copyTcls) << {
 	rrr('')
 }
+
+task doAction(dependsOn: copyTcls) << {
+	rrr('')
+}
+
 
 
 task lineReader << {
