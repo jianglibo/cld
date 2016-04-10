@@ -32,7 +32,7 @@ expect {
       exp_continue
    }
   "Welcome to" {exp_send "SHOW MASTER STATUS;\n" ; exp_continue}
-  -re "(mysql-bin\.\\d*).*?(\\d+).*?(\\d+)" {
+  -re "(mysql-bin\.\\d*).*?(\\d+)" {
      send_user |-------------------aaaaaaaaaa\n\n
      send_user "$expect_out(1,string)\n"
      send_user "$expect_out(2,string)"
