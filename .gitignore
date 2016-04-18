@@ -27,6 +27,7 @@ gradle.properties
 **/target/
 
 !gradle/**/*.jar
+!flyway-4.0/**/*.jar
 
 **/application.yml
 **/bootstrap.yml
