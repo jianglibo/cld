@@ -19,7 +19,6 @@ hs_err_pid*
 **/.project
 
 gradle.properties
-*.log
 
 **/build/
 .gradle/
@@ -31,6 +30,9 @@ gradle.properties
 
 **/application.yml
 **/bootstrap.yml
+**/application.yaml
+**/bootstrap.yaml
+**/*.log
 
 **/.vagrant/
 **/ttmp/
