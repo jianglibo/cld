@@ -4,11 +4,13 @@ buildscript {
 	}
 	repositories {
 		mavenCentral()
-		maven { url "http://repo.spring.io/release" }
+		maven { url 'http://repo.spring.io/release' }
 		mavenLocal()
 	}
 	dependencies {
 		classpath("org.springframework.boot:spring-boot-gradle-plugin:${springBootVersion}")
+    classpath 'org.jooq:jooq-codegen:3.7.3'
+    classpath 'com.h2database:h2:1.4.177'
 	}
 }
 
@@ -40,16 +42,58 @@ repositories {
 }
 
 dependencies {
-	compile("org.springframework.boot:spring-boot-starter")
-	compile("org.springframework.boot:spring-boot-starter-web")
-    compile("org.springframework.boot:spring-boot-starter-security")
+	compile('org.springframework.boot:spring-boot-starter')
+	compile('org.springframework.boot:spring-boot-starter-web')
+    compile('org.springframework.boot:spring-boot-starter-jooq')
+    compile('org.springframework.boot:spring-boot-starter-security')
     compile('com.h2database:h2:1.4.191')
-    
-	testCompile("org.springframework.boot:spring-boot-starter-test")
-    testCompile("org.springframework.security:spring-security-test")
+	compile('org.apache.httpcomponents:fluent-hc:4.5.2')
+    compile('org.apache.httpcomponents:httpmime:4.5.2')
+    compile('com.google.guava:guava:19.0')
+    compile 'org.jooq:jooq:3.7.3'
+    compile 'org.jooq:jooq-meta:3.7.3'
+
+	testCompile('org.springframework.boot:spring-boot-starter-test')
+    testCompile('org.springframework.security:spring-security-test')
     //:4.0.2.RELEASE
 }
 
+task cg << {
+
+    // Use your favourite XML builder to construct the code generation configuration file
+    // ----------------------------------------------------------------------------------
+    def writer = new StringWriter()
+    def xml = new groovy.xml.MarkupBuilder(writer)
+            .configuration('xmlns': 'http://www.jooq.org/xsd/jooq-codegen-3.7.0.xsd') {
+        jdbc() {
+            driver('org.h2.Driver')
+            url('jdbc:h2:file:C:/h2data/webproxy')
+            user('sa')
+            password('')
+        }
+        generator() {
+            database() {
+            }
+            generate([:]) {
+                pojos true
+                daos true
+            }
+            target() {
+                packageName('com.mymock.webproxy.db')
+                directory('src/main/java')
+            }
+        }
+    }
+
+    // Run the code generator
+    // ----------------------
+    org.jooq.util.GenerationTool.main(
+        javax.xml.bind.JAXB.unmarshal(
+            new StringReader(writer.toString()),
+            org.jooq.util.jaxb.Configuration.class
+        )
+    )
+}
 task wrapper(type: Wrapper) {
 	gradleVersion = '2.12'
 }

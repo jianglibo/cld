@@ -16,6 +16,8 @@ spring:
         suffix: .html
     security:
         enable-csrf: true
+    jooq:
+        sql-dialect: H2
 server:
     port: 80
 
@@ -26,6 +28,8 @@ logging:
 #        org.springframework.security.web.access: DEBUG
 #        org.hibernate.type: TRACE
 
+myapp:
+    cache-folder: d:/webproxycache
 ---
 spring:
     profiles: prod

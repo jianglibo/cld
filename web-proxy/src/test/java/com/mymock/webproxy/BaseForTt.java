@@ -40,4 +40,13 @@ public class BaseForTt {
     public void defaultAfter() {
         mvc = null;
     }
+    
+    protected void printme(Object o) {
+        System.out.println(o.toString());
+    }
+    
+    protected void printPair(Object o, Object o1) {
+        System.out.println(o.toString() + " = " + o1.toString());
+    }
+
 }

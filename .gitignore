@@ -37,3 +37,6 @@ gradle.properties
 **/.vagrant/
 **/ttmp/
 **/fixturesout/
+flyway-4.0/sql/
+flyway-4.0/conf/flyway.conf
+**/log/
