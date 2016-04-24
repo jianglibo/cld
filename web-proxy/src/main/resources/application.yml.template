@@ -25,6 +25,7 @@ logging:
     level:
         cc.openscanner: INFO
         cc.openscanner.scanhub.callback: DEBUG
+        org.jooq: DEBUG
 #        org.springframework.security.web.access: DEBUG
 #        org.hibernate.type: TRACE
 

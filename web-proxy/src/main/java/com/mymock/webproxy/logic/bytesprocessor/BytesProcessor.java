@@ -1,5 +1,6 @@
 package com.mymock.webproxy.logic.bytesprocessor;
 
+import java.io.IOException;
 import java.nio.file.Path;
 
 import org.apache.http.Header;
@@ -29,9 +30,9 @@ public abstract class BytesProcessor {
     
     public abstract void done();
     
-    public abstract void allListenerDone();
+    public abstract void allListenerDone() throws IOException;
     
-    public abstract void start();
+    public abstract void start() throws IOException;
     
     public abstract void handleNot200(int statusCode);
     
