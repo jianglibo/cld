@@ -6,10 +6,11 @@ package com.mymock.webproxy.logic;
 
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.nio.file.Path;
+import java.util.Objects;
 
 import javax.servlet.http.HttpServletRequest;
 
-import com.google.common.base.Strings;
 import com.mymock.webproxy.util.MyUtil;
 
 /**
@@ -21,6 +22,10 @@ import com.mymock.webproxy.util.MyUtil;
 public class OriginUrl {
     
     private URL url;
+    
+    public OriginUrl(URL url) {
+        this.url = url;
+    }
     
     public OriginUrl(HttpServletRequest req) throws MalformedURLException {
         this.initMe(req);
@@ -39,6 +44,25 @@ public class OriginUrl {
        url = new URL(sb.toString());
     }
     
+    @Override
+    public boolean equals(Object obj) {
+        if (!(obj instanceof OriginUrl)) {
+            return false;
+        }
+        OriginUrl other = (OriginUrl)obj;
+        return this.getUrl().equals(other.getUrl());
+    }
+    
+    @Override
+    public int hashCode() {
+        return Objects.hash(url);
+    }
+    
+    public Path getDiskPath(Path base) {
+        return MyUtil.getDiskPath(base, url);
+    }
+    
+    
     public boolean isFileLike() {
         return MyUtil.isFileLike(url);  
     }
@@ -49,5 +73,9 @@ public class OriginUrl {
 
     public void setUrl(URL url) {
         this.url = url;
+    }
+
+    public URL getUrl() {
+        return url;
     }
 }

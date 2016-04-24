@@ -4,9 +4,9 @@
 package com.mymock.webproxy.db.public_;
 
 
-import com.mymock.webproxy.db.public_.tables.Header;
 import com.mymock.webproxy.db.public_.tables.SchemaVersion;
-import com.mymock.webproxy.db.public_.tables.Url;
+import com.mymock.webproxy.db.public_.tables.Wpheader;
+import com.mymock.webproxy.db.public_.tables.Wpurl;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -32,7 +32,7 @@ import org.jooq.impl.SchemaImpl;
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class Public extends SchemaImpl {
 
-	private static final long serialVersionUID = 1908633303;
+	private static final long serialVersionUID = 1250115696;
 
 	/**
 	 * The reference instance of <code>PUBLIC</code>
@@ -55,8 +55,8 @@ public class Public extends SchemaImpl {
 
 	private final List<Sequence<?>> getSequences0() {
 		return Arrays.<Sequence<?>>asList(
-			Sequences.SYSTEM_SEQUENCE_1D9903CE_6086_4809_A491_F5E6057FE4C2,
-			Sequences.SYSTEM_SEQUENCE_6A0D66E4_546D_4280_9EB4_520A07235145);
+			Sequences.SYSTEM_SEQUENCE_85E08B77_656E_441D_ADFB_DAB575AF520F,
+			Sequences.SYSTEM_SEQUENCE_A56E76FB_D170_4E66_A7AD_9D4B6BDC245B);
 	}
 
 	@Override
@@ -69,7 +69,7 @@ public class Public extends SchemaImpl {
 	private final List<Table<?>> getTables0() {
 		return Arrays.<Table<?>>asList(
 			SchemaVersion.SCHEMA_VERSION,
-			Url.URL,
-			Header.HEADER);
+			Wpurl.WPURL,
+			Wpheader.WPHEADER);
 	}
 }

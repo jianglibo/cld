@@ -19,14 +19,16 @@ import static org.hamcrest.Matchers.greaterThan;
 import static org.jooq.impl.DSL.*;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
-import static com.mymock.webproxy.db.public_.tables.Url.URL;
-import static com.mymock.webproxy.db.public_.tables.Header.HEADER;
 
 import com.mymock.webproxy.BaseForTt;
 import com.mymock.webproxy.db.public_.Keys;
-import com.mymock.webproxy.db.public_.tables.pojos.Url;
-import com.mymock.webproxy.db.public_.tables.records.HeaderRecord;
-import com.mymock.webproxy.db.public_.tables.records.UrlRecord;
+import com.mymock.webproxy.db.public_.tables.Wpurl;
+import com.mymock.webproxy.db.public_.tables.records.WpheaderRecord;
+import com.mymock.webproxy.db.public_.tables.records.WpurlRecord;
+
+import static com.mymock.webproxy.db.public_.tables.Wpurl.WPURL;
+
+import static com.mymock.webproxy.db.public_.tables.Wpheader.WPHEADER;
 
 /**
  * @author jianglibo@gmail.com
@@ -40,7 +42,7 @@ public class FistDbTest extends BaseForTt {
     
     @Before
     public void bf() {
-        create.delete(URL).execute();
+        create.delete(Wpurl.WPURL).execute();
     }
 
     @Test
@@ -60,11 +62,11 @@ public class FistDbTest extends BaseForTt {
     @Test
     public void createCb() {
         //@formatter:off
-        String sql = create.select(URL.ID, URL.ADDRESS)
-                .from(URL)
-                .join(HEADER)
-                .on(URL.ID.equal(HEADER.URL_ID))
-                .where(URL.ID.equal(1948))
+        String sql = create.select(WPURL.ID, WPURL.ADDRESS)
+                .from(WPURL)
+                .join(WPHEADER)
+                .on(WPURL.ID.equal(WPHEADER.URL_ID))
+                .where(WPURL.ID.equal(1948))
                 .getSQL();
         //@formatter:on
         printme(sql);
@@ -75,11 +77,11 @@ public class FistDbTest extends BaseForTt {
     public void fetchRecord() {
         //@formatter:off
         Result<Record2<Integer, String>> result =
-            create.select(URL.ID, URL.ADDRESS)
-            .from(URL)
-            .join(HEADER)
-            .on(URL.ID.equal(HEADER.URL_ID))
-            .orderBy(URL.TS.asc())
+            create.select(WPURL.ID, WPURL.ADDRESS)
+            .from(WPURL)
+            .join(WPHEADER)
+            .on(WPURL.ID.equal(WPHEADER.URL_ID))
+            .orderBy(WPURL.TS.asc())
             .fetch();
         //@formatter:on
         assertThat(result.size(), equalTo(0));
@@ -87,7 +89,7 @@ public class FistDbTest extends BaseForTt {
 
     @Test
     public void fetchTypedRecords() {
-        create.fetch(URL).stream().forEach(r -> {
+        create.fetch(WPURL).stream().forEach(r -> {
             r.fetchChildren(Keys.FK_HEADER_URL).stream().forEach(cr -> {
                 printme(cr.toString());
             });
@@ -95,18 +97,18 @@ public class FistDbTest extends BaseForTt {
     }
     
     private void insertOne(String url) {
-        UrlRecord ur = create.newRecord(URL);
+        WpurlRecord ur = create.newRecord(WPURL);
         ur.setAddress(url);
         ur.store();
         assertThat(ur.getId(), greaterThan(0));
         
-        ur.into(new Url());
+        ur.into(new Wpurl());
         
-        create.insertInto(HEADER, HEADER.URL_ID, HEADER.HEADER_NAME, HEADER.HEADER_VALUE)
+        create.insertInto(WPHEADER, WPHEADER.URL_ID, WPHEADER.HEADER_NAME, WPHEADER.HEADER_VALUE)
             .values(ur.getId(), "n", " a b ")
             .values(ur.getId(), "n1", "hello")
             .execute();
-        HeaderRecord hr = create.selectFrom(HEADER).where(HEADER.HEADER_NAME.equalIgnoreCase("n")).fetchOne();
+        WpheaderRecord hr = create.selectFrom(WPHEADER).where(WPHEADER.HEADER_NAME.equalIgnoreCase("n")).fetchOne();
         
         assertThat(hr.getHeaderValue(), equalTo(" a b"));// tail blank are striped.
     }
@@ -114,23 +116,23 @@ public class FistDbTest extends BaseForTt {
     @Test
     public void cascade() {
         Field<Integer> f = count();
-        int urlc = create.select(f).from(URL).fetchOne(f);
+        int urlc = create.select(f).from(WPURL).fetchOne(f);
         assertThat(urlc, equalTo(0));
-        int heac = create.select(f).from(HEADER).fetchOne(f);
+        int heac = create.select(f).from(WPHEADER).fetchOne(f);
         assertThat(heac, equalTo(0));
         
         insertOne("bbq");
         
-        urlc = create.select(f).from(URL).fetchOne(f);
+        urlc = create.select(f).from(WPURL).fetchOne(f);
         assertThat(urlc, equalTo(1));
-        heac = create.select(f).from(HEADER).fetchOne(f);
+        heac = create.select(f).from(WPHEADER).fetchOne(f);
         assertThat(heac, equalTo(2));
         
-        create.delete(URL).execute();
+        create.delete(WPURL).execute();
 
-        urlc = create.select(f).from(URL).fetchOne(f);
+        urlc = create.select(f).from(WPURL).fetchOne(f);
         assertThat(urlc, equalTo(0));
-        heac = create.select(f).from(HEADER).fetchOne(f);
+        heac = create.select(f).from(WPHEADER).fetchOne(f);
         assertThat(heac, equalTo(0));
 
     }
@@ -139,32 +141,32 @@ public class FistDbTest extends BaseForTt {
     @Test
     public void stronglyTyped() {
         insertOne("abc");
-        UrlRecord ur = create.selectFrom(URL).fetchAny();
+        WpurlRecord ur = create.selectFrom(WPURL).fetchAny();
         assertThat(ur.getTs(), notNullValue());
         assertThat(ur.getId(), greaterThan(0));
-        create.delete(URL).execute();
+        create.delete(WPURL).execute();
     }
     
     @Test
     public void customRow() {
         insertOne("xx");
         Result<Record> result = create.select()
-                .from(URL)
-                .join(HEADER).on(URL.ID.eq(HEADER.URL_ID))
+                .from(WPURL)
+                .join(WPHEADER).on(WPURL.ID.eq(WPHEADER.URL_ID))
                 .fetch();
         result.stream().forEach(r -> {
-            UrlRecord ur = r.into(URL);
-            HeaderRecord hr = r.into(HEADER);
+            WpurlRecord ur = r.into(WPURL);
+            WpheaderRecord hr = r.into(WPHEADER);
         });
-        create.delete(URL).execute();
+        create.delete(WPURL).execute();
     }
     
     @Test
     public void insertReturn() {
       //@formatter:off
-        UrlRecord record = create.insertInto(URL, URL.ADDRESS)
+        WpurlRecord record = create.insertInto(WPURL, WPURL.ADDRESS)
                       .values("http://abc.cc/?u=v")
-                      .returning(URL.ID, URL.TS)
+                      .returning(WPURL.ID, WPURL.TS)
                       .fetchOne();
         printme("**************************");
         printme(record.getTs());

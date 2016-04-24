@@ -15,8 +15,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.ResponseBody;
 
-import com.mymock.webproxy.logic.FileDownloader;
+import com.mymock.webproxy.logic.ResourceGetter;
 import com.mymock.webproxy.logic.OriginUrl;
 
 /**
@@ -29,14 +30,23 @@ public class Mirrorlist {
 
     private String centosUrl = "http://mirrorlist.centos.org/";
     
-    @Autowired
-    private FileDownloader fd;
-
+    
     @RequestMapping(path = "/mirrorlist", method = RequestMethod.GET)
     public void getList(HttpServletRequest req, HttpServletResponse resp) throws ClientProtocolException, IOException {
         OriginUrl ou = new OriginUrl(req);
         //@formatter:off
-        fd.doit(ou, resp);
+//        fd.doit(ou, resp);
         //@formatter:on
+    }
+    
+    @RequestMapping(path = "/rd", method = RequestMethod.GET)
+    public void rd(HttpServletResponse response) throws IOException {
+        response.sendRedirect("/afterrd");
+    }
+    
+    @RequestMapping(path = "/afterrd")
+    @ResponseBody
+    public String afterrd() {
+        return "redirect";
     }
 }

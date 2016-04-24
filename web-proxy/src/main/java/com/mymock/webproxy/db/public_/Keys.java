@@ -4,12 +4,12 @@
 package com.mymock.webproxy.db.public_;
 
 
-import com.mymock.webproxy.db.public_.tables.Header;
 import com.mymock.webproxy.db.public_.tables.SchemaVersion;
-import com.mymock.webproxy.db.public_.tables.Url;
-import com.mymock.webproxy.db.public_.tables.records.HeaderRecord;
+import com.mymock.webproxy.db.public_.tables.Wpheader;
+import com.mymock.webproxy.db.public_.tables.Wpurl;
 import com.mymock.webproxy.db.public_.tables.records.SchemaVersionRecord;
-import com.mymock.webproxy.db.public_.tables.records.UrlRecord;
+import com.mymock.webproxy.db.public_.tables.records.WpheaderRecord;
+import com.mymock.webproxy.db.public_.tables.records.WpurlRecord;
 
 import javax.annotation.Generated;
 
@@ -37,41 +37,41 @@ public class Keys {
 	// IDENTITY definitions
 	// -------------------------------------------------------------------------
 
-	public static final Identity<UrlRecord, Integer> IDENTITY_URL = Identities0.IDENTITY_URL;
-	public static final Identity<HeaderRecord, Integer> IDENTITY_HEADER = Identities0.IDENTITY_HEADER;
+	public static final Identity<WpurlRecord, Integer> IDENTITY_WPURL = Identities0.IDENTITY_WPURL;
+	public static final Identity<WpheaderRecord, Integer> IDENTITY_WPHEADER = Identities0.IDENTITY_WPHEADER;
 
 	// -------------------------------------------------------------------------
 	// UNIQUE and PRIMARY KEY definitions
 	// -------------------------------------------------------------------------
 
 	public static final UniqueKey<SchemaVersionRecord> SCHEMA_VERSION_PK = UniqueKeys0.SCHEMA_VERSION_PK;
-	public static final UniqueKey<UrlRecord> CONSTRAINT_1 = UniqueKeys0.CONSTRAINT_1;
-	public static final UniqueKey<UrlRecord> UNIQUE_URL = UniqueKeys0.UNIQUE_URL;
-	public static final UniqueKey<HeaderRecord> CONSTRAINT_7 = UniqueKeys0.CONSTRAINT_7;
+	public static final UniqueKey<WpurlRecord> CONSTRAINT_4 = UniqueKeys0.CONSTRAINT_4;
+	public static final UniqueKey<WpurlRecord> UNIQUE_URL = UniqueKeys0.UNIQUE_URL;
+	public static final UniqueKey<WpheaderRecord> CONSTRAINT_5 = UniqueKeys0.CONSTRAINT_5;
 
 	// -------------------------------------------------------------------------
 	// FOREIGN KEY definitions
 	// -------------------------------------------------------------------------
 
-	public static final ForeignKey<HeaderRecord, UrlRecord> FK_HEADER_URL = ForeignKeys0.FK_HEADER_URL;
+	public static final ForeignKey<WpheaderRecord, WpurlRecord> FK_HEADER_URL = ForeignKeys0.FK_HEADER_URL;
 
 	// -------------------------------------------------------------------------
 	// [#1459] distribute members to avoid static initialisers > 64kb
 	// -------------------------------------------------------------------------
 
 	private static class Identities0 extends AbstractKeys {
-		public static Identity<UrlRecord, Integer> IDENTITY_URL = createIdentity(Url.URL, Url.URL.ID);
-		public static Identity<HeaderRecord, Integer> IDENTITY_HEADER = createIdentity(Header.HEADER, Header.HEADER.ID);
+		public static Identity<WpurlRecord, Integer> IDENTITY_WPURL = createIdentity(Wpurl.WPURL, Wpurl.WPURL.ID);
+		public static Identity<WpheaderRecord, Integer> IDENTITY_WPHEADER = createIdentity(Wpheader.WPHEADER, Wpheader.WPHEADER.ID);
 	}
 
 	private static class UniqueKeys0 extends AbstractKeys {
 		public static final UniqueKey<SchemaVersionRecord> SCHEMA_VERSION_PK = createUniqueKey(SchemaVersion.SCHEMA_VERSION, SchemaVersion.SCHEMA_VERSION.INSTALLED_RANK);
-		public static final UniqueKey<UrlRecord> CONSTRAINT_1 = createUniqueKey(Url.URL, Url.URL.ID);
-		public static final UniqueKey<UrlRecord> UNIQUE_URL = createUniqueKey(Url.URL, Url.URL.ADDRESS);
-		public static final UniqueKey<HeaderRecord> CONSTRAINT_7 = createUniqueKey(Header.HEADER, Header.HEADER.ID);
+		public static final UniqueKey<WpurlRecord> CONSTRAINT_4 = createUniqueKey(Wpurl.WPURL, Wpurl.WPURL.ID);
+		public static final UniqueKey<WpurlRecord> UNIQUE_URL = createUniqueKey(Wpurl.WPURL, Wpurl.WPURL.ADDRESS);
+		public static final UniqueKey<WpheaderRecord> CONSTRAINT_5 = createUniqueKey(Wpheader.WPHEADER, Wpheader.WPHEADER.ID);
 	}
 
 	private static class ForeignKeys0 extends AbstractKeys {
-		public static final ForeignKey<HeaderRecord, UrlRecord> FK_HEADER_URL = createForeignKey(com.mymock.webproxy.db.public_.Keys.CONSTRAINT_1, Header.HEADER, Header.HEADER.URL_ID);
+		public static final ForeignKey<WpheaderRecord, WpurlRecord> FK_HEADER_URL = createForeignKey(com.mymock.webproxy.db.public_.Keys.CONSTRAINT_4, Wpheader.WPHEADER, Wpheader.WPHEADER.URL_ID);
 	}
 }

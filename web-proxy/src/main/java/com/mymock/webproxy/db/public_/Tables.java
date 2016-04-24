@@ -4,9 +4,9 @@
 package com.mymock.webproxy.db.public_;
 
 
-import com.mymock.webproxy.db.public_.tables.Header;
 import com.mymock.webproxy.db.public_.tables.SchemaVersion;
-import com.mymock.webproxy.db.public_.tables.Url;
+import com.mymock.webproxy.db.public_.tables.Wpheader;
+import com.mymock.webproxy.db.public_.tables.Wpurl;
 
 import javax.annotation.Generated;
 
@@ -30,12 +30,12 @@ public class Tables {
 	public static final SchemaVersion SCHEMA_VERSION = com.mymock.webproxy.db.public_.tables.SchemaVersion.SCHEMA_VERSION;
 
 	/**
-	 * The table PUBLIC.URL
+	 * The table PUBLIC.WPURL
 	 */
-	public static final Url URL = com.mymock.webproxy.db.public_.tables.Url.URL;
+	public static final Wpurl WPURL = com.mymock.webproxy.db.public_.tables.Wpurl.WPURL;
 
 	/**
-	 * The table PUBLIC.HEADER
+	 * The table PUBLIC.WPHEADER
 	 */
-	public static final Header HEADER = com.mymock.webproxy.db.public_.tables.Header.HEADER;
+	public static final Wpheader WPHEADER = com.mymock.webproxy.db.public_.tables.Wpheader.WPHEADER;
 }

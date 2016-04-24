@@ -41,12 +41,13 @@ public class AppConfig implements InitializingBean {
         if (!cf.exists()) {
             cf.mkdirs();
         }
-        setCachePath(Paths.get(cf.getPath()));
+        setCachePath(cf.toPath());
         
         File pf = new File(cf, "partial");
         if (!pf.exists()) {
-            cf.mkdir();
+            pf.mkdir();
         }
+        setParitalPath(pf.toPath());
     }
 
     public String getCacheFolder() {

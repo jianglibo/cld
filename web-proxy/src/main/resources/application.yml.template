@@ -29,7 +29,7 @@ logging:
 #        org.hibernate.type: TRACE
 
 myapp:
-    cache-folder: d:/webproxycache
+    cache-folder: e:/webproxycache
 ---
 spring:
     profiles: prod

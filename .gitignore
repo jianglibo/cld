@@ -25,7 +25,7 @@ gradle.properties
 **/bin/
 **/target/
 
-!gradle/**/*.jar
+!**/gradle/**/*.jar
 !flyway-4.0/**/*.jar
 
 **/application.yml
@@ -40,3 +40,11 @@ gradle.properties
 flyway-4.0/sql/
 flyway-4.0/conf/flyway.conf
 **/log/
+
+**/public_/tables/daos/
+**/public_/tables/pojos/
+
+**/information_schema/tables/daos/
+**/information_schema/tables/pojos/
+
+**/fixturesout/
