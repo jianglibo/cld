@@ -14,7 +14,7 @@ import org.springframework.stereotype.Component;
 @Component
 public class CacheStore {
     
-    public CacheItem getItem(OriginUrl ou) {
+    public CacheItem getItem(ResourceLocation ou) {
         return null;
     }
 }

@@ -19,15 +19,19 @@ import com.mymock.webproxy.util.MyUtil;
  *         2016年4月20日
  *
  */
-public class OriginUrl {
+public class ResourceLocation {
     
     private URL url;
     
-    public OriginUrl(URL url) {
+    public ResourceLocation(Path path) throws MalformedURLException {
+        this.url = path.toUri().toURL();
+    }
+    
+    public ResourceLocation(URL url) {
         this.url = url;
     }
     
-    public OriginUrl(HttpServletRequest req) throws MalformedURLException {
+    public ResourceLocation(HttpServletRequest req) throws MalformedURLException {
         this.initMe(req);
     }
 
@@ -46,10 +50,10 @@ public class OriginUrl {
     
     @Override
     public boolean equals(Object obj) {
-        if (!(obj instanceof OriginUrl)) {
+        if (!(obj instanceof ResourceLocation)) {
             return false;
         }
-        OriginUrl other = (OriginUrl)obj;
+        ResourceLocation other = (ResourceLocation)obj;
         return this.getUrl().equals(other.getUrl());
     }
     

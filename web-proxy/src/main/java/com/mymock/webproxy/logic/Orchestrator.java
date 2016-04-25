@@ -7,6 +7,7 @@ import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.net.URISyntaxException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.HashMap;
@@ -27,9 +28,11 @@ import com.mymock.webproxy.domain.Wpheader;
 import com.mymock.webproxy.domain.Wpurl;
 import com.mymock.webproxy.exception.BytesProcessorException;
 import com.mymock.webproxy.exception.ResourceGetterException;
-import com.mymock.webproxy.logic.bytesprocessor.ToDiskFile;
-import com.mymock.webproxy.logic.bytesprocessor.ToHttpServletResponse;
-import com.mymock.webproxy.logic.bytesprocessor.ToPartialHttpServletResponse;
+import com.mymock.webproxy.logic.bytesprocessor.ToDiskWithRl;
+import com.mymock.webproxy.logic.bytesprocessor.ToHttpResp;
+import com.mymock.webproxy.logic.bytesprocessor.ToHttpRespFromPartial;
+import com.mymock.webproxy.logic.resourcegetter.ApacheHcGetter;
+import com.mymock.webproxy.logic.resourcegetter.ResourceGetter;
 import com.mymock.webproxy.util.CompositeEnv;
 import com.mymock.webproxy.util.MyUtil;
 
@@ -44,17 +47,17 @@ public class Orchestrator {
     
     private ReentrantLock lock = new ReentrantLock();
     
-    private Map<OriginUrl, ResourceGetter> processingUrls = new HashMap<>(); 
+    private Map<ResourceLocation, ResourceGetter> processingUrls = new HashMap<>(); 
     
     @Autowired
     private CompositeEnv env;
     
-    public void participate(OriginUrl ou, HttpServletResponse resp) throws ResourceGetterException, IOException, BytesProcessorException {
+    public void participate(ResourceLocation rl, HttpServletResponse resp) throws ResourceGetterException, IOException, BytesProcessorException, URISyntaxException {
         //find item by ou form db.
         //if exists, no need for resourcegetter.
         //else 
         
-        Wpurl wpurl = findInDb(ou);
+        Wpurl wpurl = findInDb(rl);
         
         if (wpurl != null) {
             wpurl.getHeaders().stream().forEach(hd -> {
@@ -74,14 +77,14 @@ public class Orchestrator {
             return;
         }
         
-        ResourceGetter rg = getrg(ou);
+        ResourceGetter rg = getrg(rl);
         
         if (rg != null) {
-            rg.addProcessor(new ToPartialHttpServletResponse(ou, resp, env));
+            rg.addProcessor(new ToHttpRespFromPartial(rl, resp, env));
         } else {
             
-            if (ou.isFileLike()) {
-                rg = new ResourceGetter(ou, new ToDiskFile(ou, env), new ToHttpServletResponse(ou, resp, env));
+            if (rl.isFileLike()) {
+                rg = new ApacheHcGetter(rl, new ToDiskWithRl(rl, env), new ToHttpResp(resp, env));
             }
             switch (rg.play()) {
             case ResourceGetter.RG_NOT_OK:
@@ -94,7 +97,7 @@ public class Orchestrator {
         }
     }
     
-    private ResourceGetter getrg(OriginUrl ou) {
+    private ResourceGetter getrg(ResourceLocation ou) {
         lock.lock();
         try {
             return processingUrls.get(ou);
@@ -103,12 +106,12 @@ public class Orchestrator {
         }
     }
     
-    private Wpurl findInDb(OriginUrl ou) {
+    private Wpurl findInDb(ResourceLocation rl) {
         //@formatter:off
         Result<Record> result = env.getCreate().select()
             .from(WPURL)
             .join(WPHEADER).on(WPURL.ID.eq(WPHEADER.URL_ID))
-            .where(WPURL.ADDRESS.eq(ou.getUrlString()))
+            .where(WPURL.ADDRESS.eq(rl.getUrlString()))
             .fetch();
         
         if (result.size() == 0) {

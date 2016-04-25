@@ -11,27 +11,43 @@ import java.util.List;
 import org.apache.http.Header;
 
 import static com.mymock.webproxy.db.public_.tables.Wpurl.WPURL;
-import static com.mymock.webproxy.db.public_.tables.Wpheader.WPHEADER;
 
 import com.google.common.collect.Lists;
 import com.mymock.webproxy.db.public_.tables.records.WpheaderRecord;
 import com.mymock.webproxy.db.public_.tables.records.WpurlRecord;
-import com.mymock.webproxy.domain.Wpheader;
 import com.mymock.webproxy.exception.BytesProcessorException;
 import com.mymock.webproxy.exception.WebProxyExpection;
-import com.mymock.webproxy.logic.OriginUrl;
+import com.mymock.webproxy.logic.ResourceLocation;
 import com.mymock.webproxy.util.CompositeEnv;
 
-public class ToDiskFile extends BytesProcessor {
+/**
+ * get target path from rl.
+ * @author jianglibo@gmail.com
+ *         2016年4月25日
+ *
+ */
+public class ToDiskWithRl extends BytesProcessor {
 
     private OutputStream os;
+    
+    private ResourceLocation rl;
 
-    public ToDiskFile(OriginUrl ou, CompositeEnv env) throws IOException {
-        super(ou, env);
+    public ToDiskWithRl(ResourceLocation rl, CompositeEnv env) throws IOException {
+        super(env);
+        this.rl = rl;
+    }
+    
+    @Override
+    public void start() throws IOException {
+        Path path = rl.getDiskPath(getEnv().getAppConfig().getParitalPath());
+        if (!Files.exists(path.getParent())) {
+            Files.createDirectories(path);
+        }
+        this.os = Files.newOutputStream(path, StandardOpenOption.CREATE, StandardOpenOption.WRITE, StandardOpenOption.TRUNCATE_EXISTING);
     }
 
     @Override
-    public void consume(byte[] bytes, int num, long numSofar, Header[] allHeaders) throws WebProxyExpection {
+    public void consume(byte[] bytes, int num, long numSofar) throws WebProxyExpection {
         try {
             os.write(bytes, 0, num);
         } catch (IOException e) {
@@ -52,19 +68,32 @@ public class ToDiskFile extends BytesProcessor {
     }
 
     @Override
-    public void allListenerDone() throws IOException {
+    public void done1() throws IOException {
+    }
+
+    @Override
+    public void handleNot200(int statusCode) {
+    }
+
+    /* (non-Javadoc)
+     * @see com.mymock.webproxy.logic.bytesprocessor.BytesProcessor#done2()
+     */
+    @Override
+    public void done2() throws IOException {
         //@formatter:off
-        Path path = getOu().getDiskPath(getEnv().getAppConfig().getCachePath());
+        Path path = rl.getDiskPath(getEnv().getAppConfig().getCachePath());
         if (!Files.exists(path.getParent())) {
             Files.createDirectories(path);
         }
-        Path partial = getOu().getDiskPath(getEnv().getAppConfig().getParitalPath());
+        
+        Path partial = rl.getDiskPath(getEnv().getAppConfig().getParitalPath());
+        
         Files.move(partial, path, StandardCopyOption.ATOMIC_MOVE);
         
         List<WpheaderRecord> whrs = Lists.newArrayList();
         
         WpurlRecord wr = getEnv().getCreate().insertInto(WPURL, WPURL.ADDRESS)
-                .values(getOu().getUrlString())
+                .values(rl.getUrlString())
                 .returning()
                 .fetchOne();
         
@@ -80,17 +109,11 @@ public class ToDiskFile extends BytesProcessor {
         //@formatter:on
     }
 
+    /* (non-Javadoc)
+     * @see com.mymock.webproxy.logic.bytesprocessor.BytesProcessor#start1()
+     */
     @Override
-    public void handleNot200(int statusCode) {
-        // TODO Auto-generated method stub
+    public void start1() throws IOException {
     }
 
-    @Override
-    public void start() throws IOException {
-        Path path = getOu().getDiskPath(getEnv().getAppConfig().getParitalPath());
-        if (!Files.exists(path.getParent())) {
-            Files.createDirectories(path);
-        }
-        this.os = Files.newOutputStream(path, StandardOpenOption.CREATE);
-    }
 }

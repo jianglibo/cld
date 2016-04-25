@@ -17,7 +17,7 @@ import org.springframework.stereotype.Component;
 @Component
 public class Dispatcher {
     
-    public void dispatch(OriginUrl ou, HttpServletResponse resp) {
+    public void dispatch(ResourceLocation ou, HttpServletResponse resp) {
 //        private final DSLContext create; 
     }
 }

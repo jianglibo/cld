@@ -10,24 +10,23 @@ import org.apache.http.HttpStatus;
 
 import com.mymock.webproxy.exception.BytesProcessorException;
 import com.mymock.webproxy.exception.WebProxyExpection;
-import com.mymock.webproxy.logic.OriginUrl;
 import com.mymock.webproxy.util.CompositeEnv;
 
-public class ToPartialHttpServletResponse extends BytesProcessor {
+public class ToHttpResp extends BytesProcessor {
     
     private HttpServletResponse resp;
     
     private OutputStream os;
+    
 
-    public ToPartialHttpServletResponse(OriginUrl ou, HttpServletResponse resp, CompositeEnv env) throws BytesProcessorException, IOException {
-        super(ou, env);
+    public ToHttpResp(HttpServletResponse resp, CompositeEnv env) throws BytesProcessorException, IOException {
+        super(env);
         this.resp = resp;
-        this.os = resp.getOutputStream();
     }
 
 
     @Override
-    public void consume(byte[] bytes, int num, long numSofar, Header[] allHeaders) throws WebProxyExpection {
+    public void consume(byte[] bytes, int num, long numSofar) throws WebProxyExpection {
         try {
             os.write(bytes, 0, num);
         } catch (IOException e) {
@@ -49,9 +48,7 @@ public class ToPartialHttpServletResponse extends BytesProcessor {
 
 
     @Override
-    public void allListenerDone() {
-        // TODO Auto-generated method stub
-        
+    public void done1() {
     }
 
 
@@ -65,11 +62,28 @@ public class ToPartialHttpServletResponse extends BytesProcessor {
 
 
     @Override
-    public void start() {
+    public void start() throws IOException {
+        this.os = resp.getOutputStream();
         resp.setStatus(HttpStatus.SC_OK);
         for(Header hd : getHeaders()) {
             resp.addHeader(hd.getName(), hd.getValue());            
         }
+    }
+
+
+    /* (non-Javadoc)
+     * @see com.mymock.webproxy.logic.bytesprocessor.BytesProcessor#done2()
+     */
+    @Override
+    public void done2() throws IOException {
+    }
+
+
+    /* (non-Javadoc)
+     * @see com.mymock.webproxy.logic.bytesprocessor.BytesProcessor#start1()
+     */
+    @Override
+    public void start1() throws IOException {
     }
 
 }

@@ -14,7 +14,7 @@ import org.springframework.stereotype.Component;
 @Component
 public class CacheResolver {
     
-    public void resolve(OriginUrl ou) {
+    public void resolve(ResourceLocation ou) {
         
     }
 }

@@ -31,6 +31,7 @@ logging:
 
 myapp:
     cache-folder: e:/webproxycache
+    favorite-mirror: xxxx
 ---
 spring:
     profiles: prod

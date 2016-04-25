@@ -17,8 +17,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 
-import com.mymock.webproxy.logic.ResourceGetter;
-import com.mymock.webproxy.logic.OriginUrl;
+import com.mymock.webproxy.logic.ResourceLocation;
+import com.mymock.webproxy.logic.resourcegetter.ResourceGetter;
 
 /**
  * @author jianglibo@gmail.com
@@ -33,7 +33,7 @@ public class Mirrorlist {
     
     @RequestMapping(path = "/mirrorlist", method = RequestMethod.GET)
     public void getList(HttpServletRequest req, HttpServletResponse resp) throws ClientProtocolException, IOException {
-        OriginUrl ou = new OriginUrl(req);
+        ResourceLocation ou = new ResourceLocation(req);
         //@formatter:off
 //        fd.doit(ou, resp);
         //@formatter:on

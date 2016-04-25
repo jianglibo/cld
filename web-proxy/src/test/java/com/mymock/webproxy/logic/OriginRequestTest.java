@@ -25,7 +25,7 @@ import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.ResultHandler;
 
 import com.mymock.webproxy.BaseForTt;
-import com.mymock.webproxy.logic.OriginUrl;
+import com.mymock.webproxy.logic.ResourceLocation;
 import com.mymock.webproxy.util.MyUtil;
 
 /**
@@ -41,21 +41,21 @@ public class OriginRequestTest extends BaseForTt {
     
     @Test
     public void setT() throws MalformedURLException {
-        Set<OriginUrl> oset = new HashSet<>();
-        OriginUrl ou = new OriginUrl(new URL("http://www.xx.com"));
-        OriginUrl ou1 = new OriginUrl(new URL("http://www.xx.com"));
+        Set<ResourceLocation> oset = new HashSet<>();
+        ResourceLocation ou = new ResourceLocation(new URL("http://www.xx.com"));
+        ResourceLocation ou1 = new ResourceLocation(new URL("http://www.xx.com"));
         oset.add(ou);
         oset.add(ou1);
         assertThat(oset.size(), equalTo(1));
         
-        assertTrue(oset.contains(new OriginUrl(new URL("http://www.xx.com"))));
+        assertTrue(oset.contains(new ResourceLocation(new URL("http://www.xx.com"))));
     }
     
     @Test
     public void ouAsMapkey() throws MalformedURLException {
-        Map<OriginUrl, Integer> m = new HashMap<>();
-        OriginUrl ou = new OriginUrl(new URL("http://www.xx.com"));
-        OriginUrl ou1 = new OriginUrl(new URL("http://www.xx.com"));
+        Map<ResourceLocation, Integer> m = new HashMap<>();
+        ResourceLocation ou = new ResourceLocation(new URL("http://www.xx.com"));
+        ResourceLocation ou1 = new ResourceLocation(new URL("http://www.xx.com"));
         m.put(ou, 10);
         assertThat(m.get(ou1), equalTo(10));
     }

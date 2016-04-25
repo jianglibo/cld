@@ -35,7 +35,7 @@ import org.jooq.impl.TableImpl;
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class Wpurl extends TableImpl<WpurlRecord> {
 
-	private static final long serialVersionUID = -2012921420;
+	private static final long serialVersionUID = 2033227647;
 
 	/**
 	 * The reference instance of <code>PUBLIC.WPURL</code>
@@ -74,11 +74,6 @@ public class Wpurl extends TableImpl<WpurlRecord> {
 	 * The column <code>PUBLIC.WPURL.CONTENT</code>.
 	 */
 	public final TableField<WpurlRecord, byte[]> CONTENT = createField("CONTENT", org.jooq.impl.SQLDataType.VARBINARY.defaulted(true), this, "");
-
-	/**
-	 * The column <code>PUBLIC.WPURL.DISK_PATH</code>.
-	 */
-	public final TableField<WpurlRecord, String> DISK_PATH = createField("DISK_PATH", org.jooq.impl.SQLDataType.CHAR.length(2147483647).defaulted(true), this, "");
 
 	/**
 	 * Create a <code>PUBLIC.WPURL</code> table reference

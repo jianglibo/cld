@@ -1,25 +1,40 @@
 package com.mymock.webproxy.logic.bytesprocessor;
 
-import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.StandardOpenOption;
 
 import com.mymock.webproxy.exception.BytesProcessorException;
 import com.mymock.webproxy.exception.WebProxyExpection;
-import com.mymock.webproxy.logic.ResourceLocation;
-import com.mymock.webproxy.util.CompositeEnv;
 
-public class ToByteArray extends BytesProcessor {
-    
+/**
+ * get target path from rl.
+ * @author jianglibo@gmail.com
+ *         2016年4月25日
+ *
+ */
+public class ToDiskWithPath extends BytesProcessor {
+
     private OutputStream os;
     
-    public ToByteArray(ResourceLocation rl, CompositeEnv env) throws IOException {
-        super(env);
-        this.os = new ByteArrayOutputStream();
+    private Path dstPath;
+    
+
+    public ToDiskWithPath(Path dstPath) throws IOException {
+        super(null);
+        this.dstPath = dstPath;
+    }
+    
+    @Override
+    public void start() throws IOException {
+        this.os = Files.newOutputStream(dstPath, StandardOpenOption.CREATE, StandardOpenOption.WRITE, StandardOpenOption.TRUNCATE_EXISTING);
     }
 
     @Override
     public void consume(byte[] bytes, int num, long numSofar) throws WebProxyExpection {
+        System.out.println(num + "," + numSofar);
         try {
             os.write(bytes, 0, num);
         } catch (IOException e) {
@@ -34,27 +49,17 @@ public class ToByteArray extends BytesProcessor {
                 os.flush();
                 os.close();
             } catch (IOException e) {
-
+                
             }
         }
     }
 
     @Override
-    public void done1() {
-        // TODO Auto-generated method stub
-        
+    public void done1() throws IOException {
     }
 
     @Override
     public void handleNot200(int statusCode) {
-        // TODO Auto-generated method stub
-        
-    }
-
-    @Override
-    public void start() {
-        // TODO Auto-generated method stub
-        
     }
 
     /* (non-Javadoc)
@@ -62,7 +67,6 @@ public class ToByteArray extends BytesProcessor {
      */
     @Override
     public void done2() throws IOException {
-        // TODO Auto-generated method stub
         
     }
 
@@ -74,4 +78,5 @@ public class ToByteArray extends BytesProcessor {
         // TODO Auto-generated method stub
         
     }
+
 }

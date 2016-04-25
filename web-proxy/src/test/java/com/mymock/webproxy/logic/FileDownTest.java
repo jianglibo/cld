@@ -8,7 +8,7 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 import java.io.IOException;
-import java.nio.file.Path;
+import java.net.URISyntaxException;
 
 import org.apache.http.Header;
 import org.junit.Test;
@@ -16,7 +16,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 import com.mymock.webproxy.BaseForTt;
 import com.mymock.webproxy.exception.ResourceGetterException;
-import com.mymock.webproxy.logic.bytesprocessor.ToDiskFile;
+import com.mymock.webproxy.logic.bytesprocessor.ToDiskWithRl;
+import com.mymock.webproxy.logic.resourcegetter.ApacheHcGetter;
+import com.mymock.webproxy.logic.resourcegetter.ResourceGetter;
 import com.mymock.webproxy.util.CompositeEnv;
 import com.mymock.webproxy.util.MyUtil;
 
@@ -36,7 +38,7 @@ public class FileDownTest extends BaseForTt {
         Thread main = Thread.currentThread();
         String urlString = "http://mirrors.aliyun.com/centos/7/os/x86_64/Packages/centos-logos-70.0.6-3.el7.centos.noarch.rpm";
         
-        OriginUrl ou = mock(OriginUrl.class);
+        ResourceLocation ou = mock(ResourceLocation.class);
         when(ou.getDiskPath(appConfig.getParitalPath())).thenReturn(MyUtil.getDiskPath(appConfig.getParitalPath(),urlString));
         when(ou.getUrlString()).thenReturn(urlString);
         
@@ -44,7 +46,7 @@ public class FileDownTest extends BaseForTt {
             @Override
             public void run() {
                 try {
-                    ResourceGetter rg = new ResourceGetter(ou, new ToDiskFile(ou, env));
+                    ResourceGetter rg = new ApacheHcGetter(ou, new ToDiskWithRl(ou, env));
                     rg.play();
                     for(Header hd : rg.getHeaders()) {
                         printPair(hd.getName(), hd.getValue());
@@ -54,6 +56,8 @@ public class FileDownTest extends BaseForTt {
                     main.interrupt();
                     e.printStackTrace();
                 } catch (IOException e) {
+                    e.printStackTrace();
+                } catch (URISyntaxException e) {
                     e.printStackTrace();
                 }
             }
