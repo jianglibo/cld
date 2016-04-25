@@ -46,6 +46,7 @@ dependencies {
 	compile('org.springframework.boot:spring-boot-starter-web')
     compile('org.springframework.boot:spring-boot-starter-jooq')
     compile('org.springframework.boot:spring-boot-starter-security')
+    compile('org.springframework.data:spring-data-commons')
     compile('com.h2database:h2:1.4.191')
 	compile('org.apache.httpcomponents:fluent-hc:4.5.2')
     compile('org.apache.httpcomponents:httpmime:4.5.2')
