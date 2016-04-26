@@ -7,6 +7,8 @@ import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
 import java.nio.file.StandardOpenOption;
 import java.util.List;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import org.apache.http.Header;
 
@@ -15,6 +17,8 @@ import static com.mymock.webproxy.db.public_.tables.Wpurl.WPURL;
 import com.google.common.collect.Lists;
 import com.mymock.webproxy.db.public_.tables.records.WpheaderRecord;
 import com.mymock.webproxy.db.public_.tables.records.WpurlRecord;
+import com.mymock.webproxy.domain.Wpheader;
+import com.mymock.webproxy.domain.Wpurl;
 import com.mymock.webproxy.exception.BytesProcessorException;
 import com.mymock.webproxy.exception.WebProxyExpection;
 import com.mymock.webproxy.logic.ResourceLocation;
@@ -22,6 +26,7 @@ import com.mymock.webproxy.util.CompositeEnv;
 
 /**
  * get target path from rl.
+ * 
  * @author jianglibo@gmail.com
  *         2016年4月25日
  *
@@ -29,14 +34,14 @@ import com.mymock.webproxy.util.CompositeEnv;
 public class ToDiskWithRl extends BytesProcessor {
 
     private OutputStream os;
-    
+
     private ResourceLocation rl;
 
     public ToDiskWithRl(ResourceLocation rl, CompositeEnv env) throws IOException {
         super(env);
         this.rl = rl;
     }
-    
+
     @Override
     public void start() throws IOException {
         Path path = rl.getDiskPath(getEnv().getAppConfig().getParitalPath());
@@ -75,7 +80,9 @@ public class ToDiskWithRl extends BytesProcessor {
     public void handleNot200(int statusCode) {
     }
 
-    /* (non-Javadoc)
+    /*
+     * (non-Javadoc)
+     * 
      * @see com.mymock.webproxy.logic.bytesprocessor.BytesProcessor#done2()
      */
     @Override
@@ -90,26 +97,26 @@ public class ToDiskWithRl extends BytesProcessor {
         
         Files.move(partial, path, StandardCopyOption.ATOMIC_MOVE);
         
-        List<WpheaderRecord> whrs = Lists.newArrayList();
+        Wpurl url = new Wpurl();
+        url.setAddress(rl.getUrlString());
         
-        WpurlRecord wr = getEnv().getCreate().insertInto(WPURL, WPURL.ADDRESS)
-                .values(rl.getUrlString())
-                .returning()
-                .fetchOne();
+        final Wpurl savedUrl = getEnv().getUrlRepo().save(url);
         
-        for(Header hd: getHeaders()) {
-            WpheaderRecord whr = new WpheaderRecord();
-            whr.setUrlId(wr.getId());
+        List<Wpheader> headers = Stream.of(getHeaders()).map(hd -> {
+            Wpheader whr = new Wpheader();
+            whr.setUrlId(savedUrl.getId());
             whr.setHeaderName(hd.getName());
             whr.setHeaderValue(hd.getValue());
-            whrs.add(whr);
-        }
+            return whr;
+        }).collect(Collectors.toList()); 
         
-        getEnv().getCreate().batchStore(whrs).execute();
+        getEnv().getHeaderRepo().save(headers);
         //@formatter:on
     }
 
-    /* (non-Javadoc)
+    /*
+     * (non-Javadoc)
+     * 
      * @see com.mymock.webproxy.logic.bytesprocessor.BytesProcessor#start1()
      */
     @Override

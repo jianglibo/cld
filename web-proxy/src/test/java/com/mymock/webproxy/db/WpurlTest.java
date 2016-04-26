@@ -19,10 +19,10 @@ import static com.mymock.webproxy.db.public_.tables.Wpurl.WPURL;
 import static com.mymock.webproxy.db.public_.tables.Wpheader.WPHEADER;
 
 public class WpurlTest extends BaseForTt {
-    
+
     @Autowired
     private DSLContext create;
-    
+
     @Test
     public void create() {
         //@formatter:off
@@ -44,19 +44,27 @@ public class WpurlTest extends BaseForTt {
 
         //@formatter:on
     }
-    
+
     @Test
     public void batch() {
         create.delete(WPURL).execute();
         create.delete(WPHEADER).execute();
+        //@formatter:off
+        WpurlRecord urlRecord = create.insertInto(WPURL, WPURL.ADDRESS)
+                .values("hello")
+                .returning()
+                .fetchOne();
+        
         List<WpheaderRecord> wrs = Lists.newArrayList();
         WpheaderRecord wr = new WpheaderRecord();
         wr.setHeaderName("a");
         wr.setHeaderValue("1");
+        wr.setUrlId(urlRecord.getId());
         wrs.add(wr);
         
         wr = new WpheaderRecord();
         wr.setHeaderName("a");
+        wr.setUrlId(urlRecord.getId());
         wr.setHeaderValue("1");
         wrs.add(wr);
         

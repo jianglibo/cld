@@ -13,6 +13,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import org.jooq.DSLContext;
 import org.jooq.impl.DSL;
 import org.junit.After;
+import org.junit.Before;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.web.servlet.MvcResult;
@@ -31,13 +32,35 @@ public class HomeTest extends BaseForTt {
     @Autowired
     private DSLContext create;
     
-    @After
+    @Before
     public void bf() {
         create.delete(WPURL).execute();
     }
     
+    @After
+    public void af() {
+        create.delete(WPURL).execute();
+    }
+
+    
     @Test
     public void t() throws Exception {
+        mvc.perform(get("/?release=6&arch=x86_64&repo=os&host=mirrorlist.centos.org"))
+        .andExpect(status().is(200))
+        .andDo(new ResultHandler() {
+                @Override
+                public void handle(MvcResult result) throws Exception {
+                    String c = result.getResponse().getContentAsString();
+                    for (String hn : result.getResponse().getHeaderNames()) {
+                        printPair(hn, result.getResponse().getHeader(hn));
+                    }
+                    assertThat(c, containsString("/x86_64"));
+                    Integer i = new Integer(0);
+                    i = create.select(DSL.count()).from(WPURL).fetchOne().into(i);
+                    assertThat(i, equalTo(1));
+                }
+            });
+        
         mvc.perform(get("/?release=6&arch=x86_64&repo=os&host=mirrorlist.centos.org"))
         .andExpect(status().is(200))
         .andDo(new ResultHandler() {

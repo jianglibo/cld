@@ -21,13 +21,11 @@ import javax.servlet.http.HttpServletResponse;
 import org.jooq.DSLContext;
 import org.jooq.Record;
 import org.jooq.Result;
-import org.jooq.impl.DSL;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.google.common.io.ByteStreams;
-import com.mymock.webproxy.db.public_.tables.records.WpurlRecord;
 import com.mymock.webproxy.domain.Wpheader;
 import com.mymock.webproxy.domain.Wpurl;
 import com.mymock.webproxy.exception.BytesProcessorException;
@@ -57,15 +55,12 @@ public class Orchestrator {
     @Autowired
     private CompositeEnv env;
     
-    @Autowired
-    private DSLContext create;
-    
     public void participate(ResourceLocation rl, HttpServletResponse resp) throws ResourceGetterException, IOException, BytesProcessorException, URISyntaxException {
         //find item by ou form db.
         //if exists, no need for resourcegetter.
         //else 
         
-        Wpurl wpurl = findInDb(rl);
+        Wpurl wpurl = env.getUrlRepo().findByAddress(rl.getUrlString());
         
         if (wpurl != null) {
             wpurl.getHeaders().stream().forEach(hd -> {
@@ -120,32 +115,5 @@ public class Orchestrator {
           lock.unlock();
         }
     }
-    
-    @Transactional
-    public Wpurl findInDb(ResourceLocation rl) {
-        //@formatter:off
-        
-        Result<Record> result = env.getCreate().select()
-            .from(WPURL)
-            .join(WPHEADER).on(WPURL.ID.eq(WPHEADER.URL_ID))
-            .where(WPURL.ADDRESS.eq(rl.getUrlString()))
-            .fetch();
-        
-        result.forEach(r -> {
-            System.out.println(r.getValue(WPURL.ID));
-        });
-        if (result.size() == 0) {
-            return null;
-        }
-        
-        Wpurl wpu = result.get(0).into(Wpurl.class);
-        List<Wpheader> headers = result.stream().map(r -> {
-           return r.into(Wpheader.class); 
-        }).collect(Collectors.toList());
-        
-        wpu.setHeaders(headers);
-        
-        return wpu;
-        //@formatter:on
-    }
+
 }

@@ -4,13 +4,22 @@
  */
 package com.mymock.webproxy.repository;
 
-import org.jooq.Field;
+import org.apache.http.Header;
+import org.jooq.Result;
 import org.jooq.TableField;
-import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Repository;
 
+import com.mymock.webproxy.db.public_.tables.records.WpheaderRecord;
 import com.mymock.webproxy.db.public_.tables.records.WpurlRecord;
+import com.mymock.webproxy.domain.Wpheader;
 import com.mymock.webproxy.domain.Wpurl;
+import static com.mymock.webproxy.db.public_.tables.Wpurl.WPURL;
+
+import java.util.List;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
+
+import static com.mymock.webproxy.db.public_.tables.Wpheader.WPHEADER;;
 
 /**
  * @author jianglibo@gmail.com
@@ -24,4 +33,17 @@ public class WpUrlRepository extends WpRepoBase<Wpurl, WpurlRecord, TableField<W
         super(com.mymock.webproxy.db.public_.tables.Wpurl.WPURL, com.mymock.webproxy.db.public_.tables.Wpurl.WPURL.ID, Wpurl.class);
     }
     
+    public Wpurl findByAddress(String address) {
+        WpurlRecord wr = create.selectFrom(WPURL).where(WPURL.ADDRESS.eq(address)).fetchOne();
+        if (wr == null) {
+            return null;
+        }
+        Wpurl url = wr.into(Wpurl.class);
+        Result<WpheaderRecord> whrs = create.selectFrom(WPHEADER).where(WPHEADER.URL_ID.eq(url.getId())).fetch();
+        List<Wpheader> whList = whrs.stream().map(whr -> {
+            return whr.into(Wpheader.class);
+        }).collect(Collectors.toList());
+        url.setHeaders(whList);
+        return url;
+    }
 }

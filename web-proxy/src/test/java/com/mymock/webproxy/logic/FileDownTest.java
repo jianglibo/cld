@@ -4,11 +4,16 @@
  */
 package com.mymock.webproxy.logic;
 
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertThat;
+import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 import java.io.IOException;
 import java.net.URISyntaxException;
+import java.net.URL;
+import java.nio.file.Files;
 
 import org.apache.http.Header;
 import org.junit.Test;
@@ -20,7 +25,6 @@ import com.mymock.webproxy.logic.bytesprocessor.ToDiskWithRl;
 import com.mymock.webproxy.logic.resourcegetter.ApacheHcGetter;
 import com.mymock.webproxy.logic.resourcegetter.ResourceGetter;
 import com.mymock.webproxy.util.CompositeEnv;
-import com.mymock.webproxy.util.MyUtil;
 
 /**
  * @author jianglibo@gmail.com
@@ -28,58 +32,35 @@ import com.mymock.webproxy.util.MyUtil;
  *
  */
 public class FileDownTest extends BaseForTt {
-    
+
     @Autowired
     private CompositeEnv env;
 
     @Test
     public void t() throws Exception {
+        
+        String fpath = "centos/7/os/x86_64/Packages/ModemManager-vala-1.1.0-8.git20130913.el7.x86_64.rpm";
+        
+        String urlString = "http://mirrors.aliyun.com/" + fpath;
 
-        Thread main = Thread.currentThread();
-        String urlString = "http://mirrors.aliyun.com/centos/7/os/x86_64/Packages/centos-logos-70.0.6-3.el7.centos.noarch.rpm";
-        
-        ResourceLocation ou = mock(ResourceLocation.class);
-        when(ou.getDiskPath(appConfig.getParitalPath())).thenReturn(MyUtil.getDiskPath(appConfig.getParitalPath(),urlString));
-        when(ou.getUrlString()).thenReturn(urlString);
-        
-        Thread t1 = new Thread(new Runnable() {
-            @Override
-            public void run() {
-                try {
-                    ResourceGetter rg = new ApacheHcGetter(ou, new ToDiskWithRl(ou, env));
-                    rg.play();
-                    for(Header hd : rg.getHeaders()) {
-                        printPair(hd.getName(), hd.getValue());
-                    }
-                    main.interrupt();
-                } catch (ResourceGetterException e) {
-                    main.interrupt();
-                    e.printStackTrace();
-                } catch (IOException e) {
-                    e.printStackTrace();
-                } catch (URISyntaxException e) {
-                    e.printStackTrace();
-                }
+        ResourceLocation rl = new ResourceLocation(new URL(urlString));
+
+        try {
+            ResourceGetter rg = new ApacheHcGetter(rl, new ToDiskWithRl(rl, env));
+            rg.play();
+            for (Header hd : rg.getHeaders()) {
+                printPair(hd.getName(), hd.getValue());
             }
-        });
-        
-        t1.run();
-        
-//        Timer timer = new Timer();
-//        
-//        timer.schedule(new TimerTask() {
-//            
-//            @Override
-//            public void run() {
-//                try {
-//                    System.out.println(Files.size(dstFile));
-//                } catch (IOException e) {
-//                    e.printStackTrace();
-//                }
-//            }
-//        }, 100, 1000);
-        
-//        Thread.sleep(1000*100000);
-
+            assertTrue("file should be in cache path.",
+                    Files.exists(appConfig.getCachePath().resolve(fpath)));
+            assertFalse("file should not be in partial path.",
+                    Files.exists(appConfig.getParitalPath().resolve(fpath)));
+        } catch (ResourceGetterException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        } catch (URISyntaxException e) {
+            e.printStackTrace();
+        }
     }
 }

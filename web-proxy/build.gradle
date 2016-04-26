@@ -31,6 +31,8 @@ jar {
 	version =  '0.0.1'
 }
 
+test { filter { includeTestsMatching "*Test*" } }
+
 bootRun {
   systemProperties = System.properties
 }
