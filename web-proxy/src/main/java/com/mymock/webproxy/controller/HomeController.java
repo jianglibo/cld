@@ -22,6 +22,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.google.common.base.Strings;
+import com.mymock.webproxy.config.AppConfig;
 import com.mymock.webproxy.exception.BytesProcessorException;
 import com.mymock.webproxy.exception.ResourceGetterException;
 import com.mymock.webproxy.logic.Orchestrator;
@@ -38,29 +39,52 @@ public class HomeController {
 
     @Autowired
     private Orchestrator orchestrator;
+    
+    @Autowired
+    private AppConfig appConfig;
 
     @RequestMapping(path = "/**", method = RequestMethod.GET)
     void home(@RequestParam(name = "host", required = false) String host, HttpServletRequest req, HttpServletResponse resp)
             throws IOException, ResourceGetterException, BytesProcessorException, URISyntaxException {
         
-        String hn = req.getServerName();
-        String reqHn = req.getRemoteHost();
+        String determinedHost = null;
+        String qs = req.getQueryString();
         
-        if (hn.equals(reqHn) && Strings.isNullOrEmpty(host)) {
-            Writer w = resp.getWriter();
-            w.write("circular request.");
-            w.close();
-            return;
+        Enumeration<String> hnEnum =req.getHeaderNames();
+        while(hnEnum.hasMoreElements()) {
+            String hn = hnEnum.nextElement();
+            if (hn.equalsIgnoreCase(appConfig.getForwardHeader())) {
+                String xf = req.getHeader(hn);
+                if(xf != null) {
+                    determinedHost = xf.split(",")[0];
+                }
+                break;
+            }
         }
-        URL url = MyUtil.fromReq(req.getRequestURL(), MyUtil.subsParameter(req.getQueryString(), "host"));
+        
+        if (determinedHost == null) {
+            if (!Strings.isNullOrEmpty(host)) {
+                determinedHost = host;
+                qs = MyUtil.subsParameter(qs, "host");
+            }
+        }
+        
+        URL url = MyUtil.fromReq(req.getRequestURL(),qs);
+        
+        if (Strings.isNullOrEmpty(determinedHost)) {
+            if ("localhost".equalsIgnoreCase(url.getHost()) ||
+                    "127.0.0.1".equalsIgnoreCase(url.getHost())) {
+                Writer w = resp.getWriter();
+                w.write("circular request.");
+                w.close();
+                return;
+            }
+        }  else {
+            url = MyUtil.changeURLHost(url, determinedHost);            
+        }
 
-        if (!Strings.isNullOrEmpty(host)) {
-            url = MyUtil.changeURLHost(url, host);
-        }
         ResourceLocation rl = new ResourceLocation(url);
-
-         orchestrator.participate(rl, resp);
-
+        orchestrator.participate(rl, resp);
     }
 
     @RequestMapping(path = "/hello", method = RequestMethod.GET)

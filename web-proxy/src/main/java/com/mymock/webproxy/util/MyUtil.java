@@ -4,16 +4,20 @@
  */
 package com.mymock.webproxy.util;
 
+import java.net.InetAddress;
 import java.net.MalformedURLException;
+import java.net.NetworkInterface;
+import java.net.SocketException;
 import java.net.URL;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.Enumeration;
 import java.util.List;
+import java.util.Set;
 import java.util.regex.Pattern;
 
-import javax.servlet.http.HttpServletRequest;
-
 import com.google.common.collect.Lists;
+import com.google.common.collect.Sets;
 
 /**
  * @author jianglibo@gmail.com
@@ -121,6 +125,26 @@ public class MyUtil {
             }
         }
         return String.join("&", after);
+    }
+    
+    public static Set<String> getServerIps() {
+        Set<String> hnames = Sets.newHashSet();
+        try {
+            Enumeration<NetworkInterface> netInterfaces = NetworkInterface.getNetworkInterfaces();
+            while(netInterfaces.hasMoreElements()) {
+                NetworkInterface ni = netInterfaces.nextElement();
+                Enumeration<InetAddress> addresses = ni.getInetAddresses();
+                while(addresses.hasMoreElements()) {
+                    InetAddress ia = addresses.nextElement();
+                    hnames.add(ia.getHostAddress());
+//                    hnames.add(ia.getHostName());
+//                    hnames.add(ia.getCanonicalHostName());
+                }
+            }
+        } catch (SocketException e) {
+            e.printStackTrace();
+        }
+        return hnames;
     }
 
 }

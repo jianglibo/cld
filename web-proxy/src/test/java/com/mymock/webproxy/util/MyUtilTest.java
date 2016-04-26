@@ -1,7 +1,6 @@
 package com.mymock.webproxy.util;
 
 import static org.hamcrest.CoreMatchers.equalTo;
-import static org.hamcrest.CoreMatchers.nullValue;
 import static org.hamcrest.Matchers.contains;
 import static org.hamcrest.Matchers.empty;
 import static org.junit.Assert.assertFalse;
@@ -13,6 +12,7 @@ import java.net.URL;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Arrays;
+import java.util.Set;
 
 import org.junit.Test;
 
@@ -91,7 +91,14 @@ public class MyUtilTest {
         qs = "host=";
         after = MyUtil.subsParameter(qs, "host");
         assertThat(after, equalTo("host"));
-        
+    }
+    
+    @Test
+    public void serverIps() {
+        Set<String> ips = MyUtil.getServerIps();
+        ips.forEach(ip -> {
+            System.out.println(ip);
+        });
     }
 
 }

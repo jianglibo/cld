@@ -34,6 +34,8 @@ public class AppConfig implements InitializingBean {
     private Path cachePath;
     
     private Path paritalPath;
+    
+    private String forwardHeader;
 
     @Override
     public void afterPropertiesSet() throws Exception {
@@ -72,6 +74,14 @@ public class AppConfig implements InitializingBean {
 
     public void setParitalPath(Path paritalPath) {
         this.paritalPath = paritalPath;
+    }
+
+    public String getForwardHeader() {
+        return forwardHeader;
+    }
+
+    public void setForwardHeader(String forwardHeader) {
+        this.forwardHeader = forwardHeader;
     }
 
 }
