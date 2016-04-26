@@ -124,17 +124,6 @@ public class Orchestrator {
     @Transactional
     public Wpurl findInDb(ResourceLocation rl) {
         //@formatter:off
-        Result<WpurlRecord> urls = env.getCreate().selectFrom(WPURL).fetch();
-        int num = urls.size();
-        
-        create.insertInto(WPURL, WPURL.ADDRESS).values("abc").execute();
-        
-        urls = env.getCreate().fetch(WPURL);
-        num = urls.size();
-        create.transaction(configuration -> {
-            DSL.using(configuration).insertInto(WPURL, WPURL.ADDRESS).values("hello").returning().fetchOne();  
-        });
-        
         
         Result<Record> result = env.getCreate().select()
             .from(WPURL)

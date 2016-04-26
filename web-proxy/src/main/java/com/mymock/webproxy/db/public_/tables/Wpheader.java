@@ -35,7 +35,7 @@ import org.jooq.impl.TableImpl;
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class Wpheader extends TableImpl<WpheaderRecord> {
 
-	private static final long serialVersionUID = 1933124542;
+	private static final long serialVersionUID = -219392833;
 
 	/**
 	 * The reference instance of <code>PUBLIC.WPHEADER</code>
@@ -58,7 +58,7 @@ public class Wpheader extends TableImpl<WpheaderRecord> {
 	/**
 	 * The column <code>PUBLIC.WPHEADER.URL_ID</code>.
 	 */
-	public final TableField<WpheaderRecord, Integer> URL_ID = createField("URL_ID", org.jooq.impl.SQLDataType.INTEGER, this, "");
+	public final TableField<WpheaderRecord, Integer> URL_ID = createField("URL_ID", org.jooq.impl.SQLDataType.INTEGER.nullable(false), this, "");
 
 	/**
 	 * The column <code>PUBLIC.WPHEADER.HEADER_NAME</code>.

@@ -4,13 +4,15 @@
  */
 package com.mymock.webproxy.controller;
 
+import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.Matchers.containsString;
 import static org.junit.Assert.assertThat;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import org.jooq.DSLContext;
-import org.junit.Before;
+import org.jooq.impl.DSL;
+import org.junit.After;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.web.servlet.MvcResult;
@@ -29,7 +31,7 @@ public class HomeTest extends BaseForTt {
     @Autowired
     private DSLContext create;
     
-    @Before
+    @After
     public void bf() {
         create.delete(WPURL).execute();
     }
@@ -46,6 +48,9 @@ public class HomeTest extends BaseForTt {
                         printPair(hn, result.getResponse().getHeader(hn));
                     }
                     assertThat(c, containsString("/x86_64"));
+                    Integer i = new Integer(0);
+                    i = create.select(DSL.count()).from(WPURL).fetchOne().into(i);
+                    assertThat(i, equalTo(1));
                 }
             });
     }

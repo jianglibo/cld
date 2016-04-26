@@ -35,7 +35,7 @@ import org.jooq.impl.TableImpl;
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class Wpurl extends TableImpl<WpurlRecord> {
 
-	private static final long serialVersionUID = 2033227647;
+	private static final long serialVersionUID = 903000121;
 
 	/**
 	 * The reference instance of <code>PUBLIC.WPURL</code>
@@ -58,7 +58,7 @@ public class Wpurl extends TableImpl<WpurlRecord> {
 	/**
 	 * The column <code>PUBLIC.WPURL.ADDRESS</code>.
 	 */
-	public final TableField<WpurlRecord, String> ADDRESS = createField("ADDRESS", org.jooq.impl.SQLDataType.CHAR.length(2147483647).defaulted(true), this, "");
+	public final TableField<WpurlRecord, String> ADDRESS = createField("ADDRESS", org.jooq.impl.SQLDataType.CHAR.length(2147483647).nullable(false), this, "");
 
 	/**
 	 * The column <code>PUBLIC.WPURL.TS</code>.
