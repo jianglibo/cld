@@ -43,7 +43,7 @@ public class HomeController {
     @Autowired
     private AppConfig appConfig;
 
-    @RequestMapping(path = "/**", method = RequestMethod.GET)
+    @RequestMapping(path = "/**")
     void home(@RequestParam(name = "host", required = false) String host, HttpServletRequest req, HttpServletResponse resp)
             throws IOException, ResourceGetterException, BytesProcessorException, URISyntaxException {
         

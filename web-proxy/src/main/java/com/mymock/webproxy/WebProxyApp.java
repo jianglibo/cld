@@ -8,6 +8,7 @@ import java.util.List;
 
 import javax.sql.DataSource;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.*;
 import org.springframework.boot.autoconfigure.*;
 import org.springframework.boot.autoconfigure.jdbc.DataSourceBuilder;
@@ -20,6 +21,8 @@ import org.springframework.web.servlet.config.annotation.EnableWebMvc;
 import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurerAdapter;
 
+import com.mymock.webproxy.intercept.ProxyIntercept;
+
 /**
  * @author jianglibo@gmail.com
  *         2016年4月19日
@@ -30,12 +33,20 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurerAdapter
 @EnableWebMvc
 @ComponentScan(basePackages="com.mymock")
 public class WebProxyApp  extends WebMvcConfigurerAdapter {
+    
+    @Autowired
+    private ProxyIntercept proxyIntercept;
 
     @Bean
     @Primary
     @ConfigurationProperties(prefix = "spring.datasource.primary")
     public DataSource primaryDataSource() {
         return DataSourceBuilder.create().build();
+    }
+    
+    @Bean
+    public ProxyIntercept proxyIntercept() {
+        return new ProxyIntercept();
     }
     
     public static void main(String[] args) throws Exception {
@@ -53,6 +64,6 @@ public class WebProxyApp  extends WebMvcConfigurerAdapter {
     @Override
     public void addInterceptors(InterceptorRegistry registry) {
 //        registry.addInterceptor(new ThemeInterceptor()).addPathPatterns("/**").excludePathPatterns("/admin/**");
-//        registry.addInterceptor(new SecurityInterceptor()).addPathPatterns("/secure/*");
+//        registry.addInterceptor(proxyIntercept).addPathPatterns("/**"); //.excludePathPatterns("/api/**", "/api");
     }
 }
