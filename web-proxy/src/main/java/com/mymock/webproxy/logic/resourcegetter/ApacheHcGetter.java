@@ -32,8 +32,8 @@ public class ApacheHcGetter extends ResourceGetter {
 
     private static final Executor executor = Executor.newInstance(new MyHttpClient().getHttpClient());
 
-    public ApacheHcGetter(ResourceLocation ou, BytesProcessor... consumers) {
-        super(ou, consumers);
+    public ApacheHcGetter(ResourceLocation rl, BytesProcessor... consumers) {
+        super(rl, consumers);
     }
 
     public String play() throws ResourceGetterException {

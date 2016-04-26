@@ -33,7 +33,7 @@ public class Mirrorlist {
     
     @RequestMapping(path = "/mirrorlist", method = RequestMethod.GET)
     public void getList(HttpServletRequest req, HttpServletResponse resp) throws ClientProtocolException, IOException {
-        ResourceLocation ou = new ResourceLocation(req);
+//        ResourceLocation ou = new ResourceLocation(req);
         //@formatter:off
 //        fd.doit(ou, resp);
         //@formatter:on

@@ -9,8 +9,6 @@ import java.net.URL;
 import java.nio.file.Path;
 import java.util.Objects;
 
-import javax.servlet.http.HttpServletRequest;
-
 import com.mymock.webproxy.util.MyUtil;
 
 /**
@@ -29,23 +27,6 @@ public class ResourceLocation {
     
     public ResourceLocation(URL url) {
         this.url = url;
-    }
-    
-    public ResourceLocation(HttpServletRequest req) throws MalformedURLException {
-        this.initMe(req);
-    }
-
-    /**
-     * @param req
-     * @throws MalformedURLException 
-     */
-    private void initMe(HttpServletRequest req) throws MalformedURLException {
-       StringBuffer sb = req.getRequestURL();
-       String qs = req.getQueryString();
-       if (qs != null) {
-           sb.append("?").append(qs);
-       }
-       url = new URL(sb.toString());
     }
     
     @Override

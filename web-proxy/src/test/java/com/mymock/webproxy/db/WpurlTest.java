@@ -12,7 +12,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 import com.google.common.collect.Lists;
 import com.mymock.webproxy.BaseForTt;
-import com.mymock.webproxy.db.public_.tables.Wpheader;
 import com.mymock.webproxy.db.public_.tables.records.WpheaderRecord;
 import com.mymock.webproxy.db.public_.tables.records.WpurlRecord;
 
@@ -48,7 +47,8 @@ public class WpurlTest extends BaseForTt {
     
     @Test
     public void batch() {
-        create.delete(Wpheader.WPHEADER).execute();
+        create.delete(WPURL).execute();
+        create.delete(WPHEADER).execute();
         List<WpheaderRecord> wrs = Lists.newArrayList();
         WpheaderRecord wr = new WpheaderRecord();
         wr.setHeaderName("a");
@@ -63,6 +63,8 @@ public class WpurlTest extends BaseForTt {
         int[] ints = create.batchStore(wrs).execute();
         
         assertThat(ints.length, equalTo(2));
+        
+        assertThat(create.selectFrom(WPHEADER).fetch().size(), equalTo(2));
     }
     
     @Test

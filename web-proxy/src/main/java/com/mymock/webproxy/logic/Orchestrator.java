@@ -18,16 +18,21 @@ import java.util.stream.Collectors;
 
 import javax.servlet.http.HttpServletResponse;
 
+import org.jooq.DSLContext;
 import org.jooq.Record;
 import org.jooq.Result;
+import org.jooq.impl.DSL;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.google.common.io.ByteStreams;
+import com.mymock.webproxy.db.public_.tables.records.WpurlRecord;
 import com.mymock.webproxy.domain.Wpheader;
 import com.mymock.webproxy.domain.Wpurl;
 import com.mymock.webproxy.exception.BytesProcessorException;
 import com.mymock.webproxy.exception.ResourceGetterException;
+import com.mymock.webproxy.logic.bytesprocessor.ToDbWithRl;
 import com.mymock.webproxy.logic.bytesprocessor.ToDiskWithRl;
 import com.mymock.webproxy.logic.bytesprocessor.ToHttpResp;
 import com.mymock.webproxy.logic.bytesprocessor.ToHttpRespFromPartial;
@@ -51,6 +56,9 @@ public class Orchestrator {
     
     @Autowired
     private CompositeEnv env;
+    
+    @Autowired
+    private DSLContext create;
     
     public void participate(ResourceLocation rl, HttpServletResponse resp) throws ResourceGetterException, IOException, BytesProcessorException, URISyntaxException {
         //find item by ou form db.
@@ -80,12 +88,19 @@ public class Orchestrator {
         ResourceGetter rg = getrg(rl);
         
         if (rg != null) {
-            rg.addProcessor(new ToHttpRespFromPartial(rl, resp, env));
-        } else {
+            if (rl.isFileLike()) {
+                rg.addProcessor(new ToHttpRespFromPartial(rl, resp, env));
+            } else {
+                //TODO partial bytes processor.
+            }
             
+        } else {
             if (rl.isFileLike()) {
                 rg = new ApacheHcGetter(rl, new ToDiskWithRl(rl, env), new ToHttpResp(resp, env));
+            } else {
+                rg = new ApacheHcGetter(rl, new ToDbWithRl(rl, env), new ToHttpResp(resp, env));
             }
+            
             switch (rg.play()) {
             case ResourceGetter.RG_NOT_OK:
                 break;
@@ -106,14 +121,30 @@ public class Orchestrator {
         }
     }
     
-    private Wpurl findInDb(ResourceLocation rl) {
+    @Transactional
+    public Wpurl findInDb(ResourceLocation rl) {
         //@formatter:off
+        Result<WpurlRecord> urls = env.getCreate().selectFrom(WPURL).fetch();
+        int num = urls.size();
+        
+        create.insertInto(WPURL, WPURL.ADDRESS).values("abc").execute();
+        
+        urls = env.getCreate().fetch(WPURL);
+        num = urls.size();
+        create.transaction(configuration -> {
+            DSL.using(configuration).insertInto(WPURL, WPURL.ADDRESS).values("hello").returning().fetchOne();  
+        });
+        
+        
         Result<Record> result = env.getCreate().select()
             .from(WPURL)
             .join(WPHEADER).on(WPURL.ID.eq(WPHEADER.URL_ID))
             .where(WPURL.ADDRESS.eq(rl.getUrlString()))
             .fetch();
         
+        result.forEach(r -> {
+            System.out.println(r.getValue(WPURL.ID));
+        });
         if (result.size() == 0) {
             return null;
         }
