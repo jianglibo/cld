@@ -24,7 +24,7 @@ public class LogFinder {
     
     private String s = "sqgk/request_dispatch.jsp?url=applyform_add_dowith.jsp";
     private String sample = "10.74.111.24 - - [23/Feb/2015:17:24:55 +0800] \"POST /wcm/services/sqgk/request_dispatch.jsp?url=applyform_add_dowith.jsp HTTP/1.0\" 502 383 \"-\" \"Mozilla/4.0 (compatible; MSIE 8.0; Windows NT 5.2)\"";
-    private Pattern ptn = Pattern.compile(".*2015:.*POST.*/sqgk/request_dispatch.jsp\\?url=applyform_add_dowith.jsp.*");
+    private Pattern ptn = Pattern.compile(".*2016:.*POST.*/sqgk/request_dispatch.jsp\\?url=applyform_add_dowith.jsp.*");
     
     @Test
     public void pattern() {

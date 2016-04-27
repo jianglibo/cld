@@ -15,6 +15,7 @@ import org.springframework.boot.autoconfigure.jdbc.DataSourceBuilder;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
+import org.springframework.context.annotation.EnableAspectJAutoProxy;
 import org.springframework.context.annotation.Primary;
 import org.springframework.web.method.support.HandlerMethodArgumentResolver;
 import org.springframework.web.servlet.config.annotation.EnableWebMvc;
@@ -32,6 +33,7 @@ import com.mymock.webproxy.intercept.ProxyIntercept;
 @EnableAutoConfiguration
 @EnableWebMvc
 @ComponentScan(basePackages="com.mymock")
+@EnableAspectJAutoProxy
 public class WebProxyApp  extends WebMvcConfigurerAdapter {
     
     @Autowired
