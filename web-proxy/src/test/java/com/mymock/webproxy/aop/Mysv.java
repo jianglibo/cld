@@ -10,6 +10,5 @@ package com.mymock.webproxy.aop;
  *
  */
 public interface Mysv {
-    
     String doSomeThing(String commaPair);
 }

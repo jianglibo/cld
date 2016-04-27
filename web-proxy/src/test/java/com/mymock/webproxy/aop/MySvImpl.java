@@ -4,8 +4,8 @@
  */
 package com.mymock.webproxy.aop;
 
+
 import org.springframework.stereotype.Component;
-import org.springframework.stereotype.Service;
 
 /**
  * @author jianglibo@gmail.com
@@ -13,6 +13,7 @@ import org.springframework.stereotype.Service;
  *
  */
 @Component
+@JooqRepository(collectionResourceRel="aaa", path="aaa")
 public class MySvImpl implements Mysv {
 
     /* (non-Javadoc)
@@ -20,7 +21,7 @@ public class MySvImpl implements Mysv {
      */
     @Override
     public String doSomeThing(String commaPair) {
-        System.out.println("*********************");
+        System.out.println(commaPair);
         return null;
     }
 

@@ -5,7 +5,6 @@
 package com.mymock.webproxy.aop;
 
 import org.springframework.stereotype.Component;
-import org.springframework.stereotype.Service;
 
 /**
  * @author jianglibo@gmail.com
@@ -13,6 +12,7 @@ import org.springframework.stereotype.Service;
  *
  */
 @Component
+@JooqRepository(collectionResourceRel="aab", path="aab")    
 public class MySvImpl1 implements Mysv {
 
     /* (non-Javadoc)
