@@ -19,7 +19,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
  *
  */
 @Controller
-public class Mirrorlist {
+public class MirrorlistController {
     
     @RequestMapping(path = "/rd", method = RequestMethod.GET)
     public void rd(HttpServletResponse response) throws IOException {

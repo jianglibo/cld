@@ -51,3 +51,7 @@ server:
     tomcat:
         remote_ip_header: x-forwarded-for
         protocol_header: x-forwarded-proto
+myapp:
+    cache-folder: /opt/webproxy/cache
+    favorite-mirror: xxxx
+    forward-header: X-Forwarded-For

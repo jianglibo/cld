@@ -2,6 +2,27 @@
 # install-redis.tcl \
 exec tclsh "$0" ${1+"$@"}
 
+# copy xx.jar and all tcl file to server.
+# run-on-server.tcl
+
+set ::baseDir [file dirname [info script]]
+package require Expect
+
+set ::serverSideDir ~/spring-boot-install
+
+proc prepareRunFolder {host} {
+  puts "start prepare run folder on server $host...."
+  puts [exec ssh root@$host "mkdir -p $::serverSideDir"]
+  puts [exec scp -r [file join $::baseDir scripts $an]  root@$host:$::serverSideDir]
+  set tmp [glob -types f -directory $::baseDir -- *.*]
+
+  foreach f $tmp {
+    exec scp $f root@${host}:$::serverSideDir
+  }
+}
+
+
+
 catch {[exec systemctl list-unit-files | grep redis]} units
 
 if {[lsearch units redis.service] != -1} {

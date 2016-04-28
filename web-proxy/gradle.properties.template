@@ -1,0 +1,4 @@
+identityFile=G:/cygwin64/home/Administrator/.ssh/id_rsa
+knownHosts=D:/cygwin64/home/Administrator/.ssh/known_hosts
+runUser=webproxy
+runGroup=webproxy

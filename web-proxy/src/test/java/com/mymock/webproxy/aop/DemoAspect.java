@@ -26,7 +26,18 @@ public class DemoAspect {
 //    execution(int *()), with return type int, no parameter.
 //    call(*.new(int, int)), any class construct with two int parameters.
 //    target(Point) && call(int *()), any instance of Point,
+//  execution(* *(..)), with any return type,any method name, any parameter.
     
+//  call(* set(..)), with any return type, any method start with "set", any return type, 
+//  execution(int *()), with return type int, no parameter.
+//  call(*.new(int, int)), any class construct with two int parameters.
+//  target(Point) && call(int *()), any instance of Point,
+  
+//  call(Foo+.new()), include subtype of Foo
+  
+//  Type names that contain the two wildcards "*" and ".." are also type patterns. The * wildcard matches zero or more characters characters except for ".",
+//  ".."  within(com.xerox..*)
+      
     
     @Autowired
     private DSLContext create;
