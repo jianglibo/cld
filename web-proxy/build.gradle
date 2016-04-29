@@ -80,7 +80,7 @@ remotes {
     }
 }
 
-task firstDeploy << {
+task deploy << {
 	String host = System.properties.host
 
 	if (!host) {
@@ -92,14 +92,13 @@ task firstDeploy << {
 
 	def remoteDir = remoteBase + "/" + pn
 
-
 	remotes.rmt.setProperty('host', host)
 	ssh.run {
 		session(remotes.rmt) {
 			execute "rm -rvf ${remoteDir}  >/dev/null; mkdir -p ${remoteDir}"
 			put from: "${projectDir}/deployer", into: "$remoteDir"
 			put from: "${projectDir}/build/libs/${jar.baseName}-${jar.version}.jar", into: remoteDir
-			def cmdStr = "tclsh ${remoteDir}/deployer/run-on-server.tcl --profile=prod firstDeploy"
+			def cmdStr = "tclsh ${remoteDir}/deployer/run-on-server.tcl --profile=prod deploy"
 			println "staring remote execute: $cmdStr"
 			execute cmdStr
 		}

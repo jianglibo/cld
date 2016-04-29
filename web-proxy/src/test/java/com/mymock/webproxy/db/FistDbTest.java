@@ -47,6 +47,7 @@ public class FistDbTest extends BaseForTt {
 
     @Test
     public void createSQL() {
+        printme(appConfig.getMyips());
         //@formatter:off
         String sql = create.select(field("URL.ID"), field("URL.ADDRESS"))
                 .from(table("URL"))

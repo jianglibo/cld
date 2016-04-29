@@ -6,7 +6,8 @@ package com.mymock.webproxy.config;
 
 import java.io.File;
 import java.nio.file.Path;
-import java.nio.file.Paths;
+import java.util.List;
+import java.util.Set;
 
 import javax.annotation.Priority;
 
@@ -15,6 +16,8 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.stereotype.Component;
+
+import com.google.common.collect.Sets;
 
 /**
  * 
@@ -34,6 +37,8 @@ public class AppConfig implements InitializingBean {
     private Path cachePath;
     
     private Path paritalPath;
+    
+    private List<String> myips;
     
     private String forwardHeader;
 
@@ -84,4 +89,11 @@ public class AppConfig implements InitializingBean {
         this.forwardHeader = forwardHeader;
     }
 
+    public List<String> getMyips() {
+        return myips;
+    }
+
+    public void setMyips(List<String> myips) {
+        this.myips = myips;
+    }
 }

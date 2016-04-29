@@ -32,7 +32,10 @@ logging:
 myapp:
     cache-folder: e:/webproxycache
     favorite-mirror: xxxx
-    forward-header: X-Forwarded-For
+    forward-header: x-forwarded-host
+    myips:
+        - 127.0.0.1
+        - 192.168.33.50
 ---
 spring:
     profiles: prod
@@ -42,8 +45,8 @@ spring:
         primary:
             url: jdbc:h2:file:/opt/h2data/webproxy
             username: sa
-            password: 
-            driver-class-name: com.mysql.jdbc.Driver
+            password:
+            driver-class-name: org.h2.Driver
             validation-query: SELECT 1
             test-on-borrow: true
 server:
@@ -52,6 +55,9 @@ server:
         remote_ip_header: x-forwarded-for
         protocol_header: x-forwarded-proto
 myapp:
-    cache-folder: /opt/webproxy/cache
+    cache-folder: cache
     favorite-mirror: xxxx
-    forward-header: X-Forwarded-For
+    forward-header: x-forwarded-host
+    myips:
+        - 127.0.0.1
+        - 192.168.33.50

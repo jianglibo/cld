@@ -71,7 +71,7 @@ public class HomeController {
         
         URL url = MyUtil.fromReq(req.getRequestURL(),qs);
         
-        if (Strings.isNullOrEmpty(determinedHost)) {
+        if (Strings.isNullOrEmpty(determinedHost) || appConfig.getMyips().contains(determinedHost)) {
             if ("localhost".equalsIgnoreCase(url.getHost()) ||
                     "127.0.0.1".equalsIgnoreCase(url.getHost())) {
                 Writer w = resp.getWriter();

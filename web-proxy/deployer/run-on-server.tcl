@@ -20,6 +20,13 @@ set runFolder /opt/$appName
 set unitFile /etc/systemd/system/${appName}.service
 set javaExec [exec which java]
 set systemdExec [file join $runFolder boot-run-systemd.tcl]
+set pidFile "${runFolder}/${appName}.pid"
+
+if {! [file exists $runFolder]} {
+  exec mkdir -p $runFolder
+}
+
+exec chown -R "${runUser}:${runGroup}" $runFolder
 
 foreach jar [glob -directory [file join $::baseDir ..] -types f -- *.jar] {
   set tname [file join $runFolder [file tail $jar]]
@@ -30,6 +37,7 @@ foreach jar [glob -directory [file join $::baseDir ..] -types f -- *.jar] {
     }
     exec mv $tname $oname
   }
+  puts $jar
   exec cp $jar $tname
 }
 
@@ -38,13 +46,7 @@ if {[catch {exec grep -Ei "^${runUser}:" /etc/passwd} msg o]} {
   exec useradd -r -g $runGroup -s /bin/false $runUser
 }
 
-if {! [file exists $runFolder]} {
-  exec mkdir -p $runFolder
-}
-
-exec chown -R "${runUser}:${runGroup}" $runFolder
-
-set strMap "@runFolder@ $runFolder @jarFile@ $tname @profile@ [dict get $::rawParamDict profile]"
+set strMap "@runFolder@ $runFolder @jarFile@ $tname @profile@ [dict get $::rawParamDict profile ] @runUser@ $runUser @pidFile@ $pidFile"
 
 if {[catch {open [file join $::baseDir boot-run-systemd.tcl]} fid o]} {
   puts stdout $fid
@@ -67,9 +69,12 @@ if {[catch {open [file join $::baseDir boot-run-systemd.tcl]} fid o]} {
   }
 }
 
-exec chmod a+x $systemdExec
+exec chown -R ${runUser}:${runGroup} $runFolder
 
+exec chmod a+x $systemdExec
 	# create unit file
+  # Type=simple
+  # Type = forking
 set unitFd [open $unitFile w]
 set content {
 	[Unit]
@@ -78,11 +83,11 @@ set content {
 	[Service]
 	ExecStart=%s
 	Type=simple
-	PIDFile=/var/run/%s.pid
+	PIDFile=%s
 	[Install]
 	WantedBy=multi-user.target
 }
-foreach line [split [format $content $appName $systemdExec $appName] \n] {
+foreach line [split [format $content $appName $systemdExec $pidFile] \n] {
   puts $unitFd [string trim $line]
 }
 close $unitFd
@@ -90,7 +95,7 @@ close $unitFd
 catch {
 	exec systemctl daemon-reload
 	exec systemctl enable ${appName}.service
-  exec systemctl start ${appName}
+  exec systemctl restart ${appName}
 } msg
 
 puts stdout $msg

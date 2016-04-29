@@ -2,8 +2,12 @@
 # install-redis.tcl \
 exec tclsh "$0" ${1+"$@"}
 
+package require Expect
+
 set ::baseDir [file dirname [info script]]
 lappend auto_path [file join $::baseDir share]
+
+set ::baseDirAbs [file normalize $::baseDir]
 
 set confFile [file join $::baseDir conf flyway.conf]
 set sqlFolder [file join $::baseDir sql]
@@ -26,7 +30,7 @@ foreach a $::argv {
 
 if {! [info exists actionName]} {
   puts "Usage:"
-  puts "tclsh run.tcl --pfolder=xxx --profile=xxx migrate"
+  puts "tclsh run.tcl --pfolder=xxx --profile=xxx -host=xxxx(when remote exec) migrate"
   exit 0
 }
 
@@ -44,7 +48,8 @@ set pSqlFolder [file join $pfolder flyway sql]
 if {[file pathtype $pfolder] ne {absolute}} {
   set pfolder [file join $::baseDir .. $pfolder]
 }
-
+puts $pConfFile
+puts $pSqlFolder
 if {! ([file exists $pConfFile] && [file exists $pSqlFolder])} {
   puts "there must exist an flyway folder in project folder."
   exit 0
@@ -54,13 +59,21 @@ file copy -force  $pConfFile $confFile
 
 file copy -force {*}[glob -directory $pSqlFolder *] $sqlFolder
 
-cd $::baseDir
-#if {$tcl_platform(platform) eq {windows}} {
-puts [exec cmd /c flyway $actionName]
-#} else {
-#  puts [exec [file join $::baseDir flyway.cmd] $actionName]
-#}
+set hostExists [dict exists $::rawParamDict host]
 
+cd $::baseDir
+
+if {$hostExists} {
+  set host [dict get $::rawParamDict host]
+  puts $::baseDir
+  exec scp -r $::baseDirAbs  "root@${host}:."
+  spawn ssh root@$host "cd ~/[file tail $::baseDir];dos2unix flyway;./flyway $actionName"
+  expect {
+    eof {}
+  }
+} else {
+  puts [exec cmd /c flyway $actionName]
+}
 
 #clean up.
 file delete -force $sqlFolder
