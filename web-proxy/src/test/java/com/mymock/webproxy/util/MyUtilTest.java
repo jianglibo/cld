@@ -100,5 +100,17 @@ public class MyUtilTest {
             System.out.println(ip);
         });
     }
+    
+    @Test
+    public void port() throws MalformedURLException {
+        URL url = new URL("http://www.fh.gov.cn");
+        
+        assertThat(url.getPort(), equalTo(-1));
+        
+        url = MyUtil.changePort(url, -1);
+        
+        assertThat(url.toString(), equalTo("http://www.fh.gov.cn"));
+        
+    }
 
 }

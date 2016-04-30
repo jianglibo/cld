@@ -82,6 +82,8 @@ public class HomeController {
         }  else {
             url = MyUtil.changeURLHost(url, determinedHost);            
         }
+        
+        url = MyUtil.changePort(url, -1);
 
         ResourceLocation rl = new ResourceLocation(url);
         orchestrator.participate(rl, resp);

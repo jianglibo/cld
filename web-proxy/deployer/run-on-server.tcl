@@ -82,7 +82,7 @@ set content {
 	After=network.target
 	[Service]
 	ExecStart=%s
-	Type=simple
+	Type=forking
 	PIDFile=%s
 	[Install]
 	WantedBy=multi-user.target

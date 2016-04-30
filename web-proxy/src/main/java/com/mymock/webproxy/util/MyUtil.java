@@ -99,6 +99,14 @@ public class MyUtil {
         return new URL(url.getProtocol(), host, url.getPort(), sb.toString());
     }
 
+    public static URL changePort(URL url, int port) throws MalformedURLException {
+        StringBuffer sb = new StringBuffer(url.getPath());
+        if (url.getQuery() != null) {
+            sb.append("?").append(url.getQuery());
+        }
+        return new URL(url.getProtocol(), url.getHost(), port, sb.toString());
+    }
+
     public static URL fromReq(StringBuffer requestUrl, String qs) throws MalformedURLException {
         if (qs != null) {
             requestUrl.append("?").append(qs);
@@ -146,5 +154,6 @@ public class MyUtil {
         }
         return hnames;
     }
+
 
 }

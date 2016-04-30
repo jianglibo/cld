@@ -30,7 +30,7 @@ foreach a $::argv {
 
 if {! [info exists actionName]} {
   puts "Usage:"
-  puts "tclsh run.tcl --pfolder=xxx --profile=xxx -host=xxxx(when remote exec) migrate"
+  puts "tclsh run.tcl --pfolder=xxx --profile=xxx -host=xxxx(when remote exec) --user=xxxx(optional) migrate"
   exit 0
 }
 
@@ -63,11 +63,21 @@ set hostExists [dict exists $::rawParamDict host]
 
 cd $::baseDir
 
+set paramStr [list]
+
+dict for {k v} $::rawParamDict {
+  lappend paramStr "--${k}=$v"
+}
+
+set paramStr [join $paramStr { }]
+
 if {$hostExists} {
   set host [dict get $::rawParamDict host]
   puts $::baseDir
   exec scp -r $::baseDirAbs  "root@${host}:."
-  spawn ssh root@$host "cd ~/[file tail $::baseDir];dos2unix flyway;./flyway $actionName"
+
+#  spawn ssh root@$host "cd ~/[file tail $::baseDir];dos2unix flyway;./flyway $actionName"
+ spawn ssh root@$host "cd ~/[file tail $::baseDir];tclsh run-on-server.tcl $paramStr $actionName"
   expect {
     eof {}
   }

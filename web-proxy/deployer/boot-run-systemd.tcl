@@ -16,11 +16,13 @@ cd $runFolder
 #set pidf [exec {*}$exeCmd &]
 
 
-set fid [open "| su -c  \"java -jar -Dspring.profiles.active=$profile $jarFile\" -s /bin/bash $runUser"]
+#set fid [open "| su -c  \"java -jar -Dspring.profiles.active=$profile $jarFile\" -s /bin/bash $runUser"]
+set fid [exec sudo -u $runUser java -jar -Dspring.profiles.active=$profile $jarFile >>& nohup.log &]
 puts $fid
-exec echo [pid $fid] > $pidFile
-puts [pid]
-set nohup [open nohup.log a+]
-while {[gets $fid line] >= 0} {
-    puts $nohup $line
-}
+#exec echo [pid $fid] > $pidFile
+exec echo $fid > $pidFile
+#puts [pid]
+#set nohup [open nohup.log a+]
+#while {[gets $fid line] >= 0} {
+#    puts $nohup $line
+#}
