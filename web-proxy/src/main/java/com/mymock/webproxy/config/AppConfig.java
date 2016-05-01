@@ -41,6 +41,8 @@ public class AppConfig implements InitializingBean {
     private List<String> myips;
     
     private String forwardHeader;
+    
+    private String favoriteMirror;
 
     @Override
     public void afterPropertiesSet() throws Exception {
@@ -95,5 +97,13 @@ public class AppConfig implements InitializingBean {
 
     public void setMyips(List<String> myips) {
         this.myips = myips;
+    }
+
+    public String getFavoriteMirror() {
+        return favoriteMirror;
+    }
+
+    public void setFavoriteMirror(String favoriteMirror) {
+        this.favoriteMirror = favoriteMirror;
     }
 }

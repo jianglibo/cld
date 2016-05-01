@@ -9,12 +9,15 @@ import java.io.Writer;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.Enumeration;
+import java.util.List;
 
 import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -23,10 +26,15 @@ import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.google.common.base.Strings;
 import com.mymock.webproxy.config.AppConfig;
+import com.mymock.webproxy.domain.Wpurl;
+
+import static com.mymock.webproxy.db.public_.tables.Wpurl.WPURL;
 import com.mymock.webproxy.exception.BytesProcessorException;
 import com.mymock.webproxy.exception.ResourceGetterException;
 import com.mymock.webproxy.logic.Orchestrator;
 import com.mymock.webproxy.logic.ResourceLocation;
+import com.mymock.webproxy.repository.WpUrlRepository;
+import com.mymock.webproxy.util.CompositeEnv;
 import com.mymock.webproxy.util.MyUtil;
 
 /**
@@ -42,6 +50,12 @@ public class HomeController {
     
     @Autowired
     private AppConfig appConfig;
+    
+    @Autowired
+    private WpUrlRepository wpUrlRepository;
+    
+    @Autowired
+    private CompositeEnv cenv;
 
     @RequestMapping(path = "/**")
     void home(@RequestParam(name = "host", required = false) String host, HttpServletRequest req, HttpServletResponse resp)
@@ -108,6 +122,20 @@ public class HomeController {
         }
         return sb.toString();
     }
+    
+    @RequestMapping(path = "/wpurls", method = RequestMethod.GET)
+    ResponseEntity<List<Wpurl>> wpurls(HttpServletRequest req) {
+        List<Wpurl> wpurls = cenv.getCreate().select(WPURL.ID, WPURL.ADDRESS).from(WPURL).fetch().into(Wpurl.class);
+        return new ResponseEntity<List<Wpurl>>(wpurls, HttpStatus.OK);
+    }
+
+    @RequestMapping(path = "/wpurls-delete-all", method = RequestMethod.GET)
+    @ResponseBody
+    String wpurlsDeleteAll(HttpServletRequest req) {
+        wpUrlRepository.deleteAll();
+        return "ok";
+    }
+    
 }
 
 // ><|:&

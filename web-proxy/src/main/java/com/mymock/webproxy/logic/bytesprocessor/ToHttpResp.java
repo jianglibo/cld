@@ -11,6 +11,7 @@ import org.apache.http.HttpStatus;
 import com.mymock.webproxy.exception.BytesProcessorException;
 import com.mymock.webproxy.exception.WebProxyExpection;
 import com.mymock.webproxy.util.CompositeEnv;
+import com.mymock.webproxy.util.HeaderUtil;
 
 public class ToHttpResp extends BytesProcessor {
     
@@ -56,7 +57,9 @@ public class ToHttpResp extends BytesProcessor {
     public void handleNot200(int statusCode) {
         resp.setStatus(statusCode);
         for(Header hd : getHeaders()) {
-            resp.addHeader(hd.getName(), hd.getValue());            
+            if (! HeaderUtil.skip(hd.getName())) {
+                resp.setHeader(hd.getName(), hd.getValue());
+            }
         }
     }
 
@@ -66,7 +69,9 @@ public class ToHttpResp extends BytesProcessor {
         this.os = resp.getOutputStream();
         resp.setStatus(HttpStatus.SC_OK);
         for(Header hd : getHeaders()) {
-            resp.addHeader(hd.getName(), hd.getValue());            
+            if (! HeaderUtil.skip(hd.getName())) {
+                resp.setHeader(hd.getName(), hd.getValue());
+            }
         }
     }
 

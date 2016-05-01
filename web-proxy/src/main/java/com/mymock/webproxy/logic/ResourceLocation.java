@@ -43,6 +43,10 @@ public class ResourceLocation {
         return Objects.hash(url);
     }
     
+    public String getHost() {
+        return this.getUrl().getHost();
+    }
+    
     public Path getDiskPath(Path base) {
         return MyUtil.getDiskPath(base, url);
     }

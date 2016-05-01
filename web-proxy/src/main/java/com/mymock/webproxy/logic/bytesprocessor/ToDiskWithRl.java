@@ -46,8 +46,13 @@ public class ToDiskWithRl extends BytesProcessor {
     public void start() throws IOException {
         Path path = rl.getDiskPath(getEnv().getAppConfig().getParitalPath());
         if (!Files.exists(path.getParent())) {
-            Files.createDirectories(path);
+            Files.createDirectories(path.getParent());
         }
+        
+        if (Files.exists(path)) {
+            Files.delete(path);
+        }
+        
         this.os = Files.newOutputStream(path, StandardOpenOption.CREATE, StandardOpenOption.WRITE, StandardOpenOption.TRUNCATE_EXISTING);
     }
 
@@ -90,7 +95,7 @@ public class ToDiskWithRl extends BytesProcessor {
         //@formatter:off
         Path path = rl.getDiskPath(getEnv().getAppConfig().getCachePath());
         if (!Files.exists(path.getParent())) {
-            Files.createDirectories(path);
+            Files.createDirectories(path.getParent());
         }
         
         Path partial = rl.getDiskPath(getEnv().getAppConfig().getParitalPath());

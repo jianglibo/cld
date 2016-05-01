@@ -56,7 +56,7 @@ server:
         protocol_header: x-forwarded-proto
 myapp:
     cache-folder: cache
-    favorite-mirror: xxxx
+    favorite-mirror: http://mirrors.aliyun.com
     forward-header: x-forwarded-host
     myips:
         - 127.0.0.1

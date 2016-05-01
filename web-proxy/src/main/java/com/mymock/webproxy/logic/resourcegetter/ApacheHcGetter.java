@@ -40,6 +40,7 @@ public class ApacheHcGetter extends ResourceGetter {
         try {
             return executor.execute(Request.Get(getRl().getUrlString())).handleResponse(new DownloadHandler());
         } catch (IOException e) {
+            e.printStackTrace();
             throw new ResourceGetterException(2001, e.getMessage());
         }
     }
@@ -53,13 +54,15 @@ public class ApacheHcGetter extends ResourceGetter {
         @Override
         public String handleResponse(HttpResponse aresp) throws ClientProtocolException, IOException {
             StatusLine statusLine = aresp.getStatusLine();
+            setHeaders(aresp.getAllHeaders());
             if (statusLine.getStatusCode() != 200) {
                 for (BytesProcessor sp : getConsumers()) {
+                    sp.setHeaders(getHeaders());
                     sp.handleNot200(statusLine.getStatusCode());
                 }
                 return RG_NOT_OK;
             }
-            setHeaders(aresp.getAllHeaders());
+
 
             HttpEntity entity = aresp.getEntity();
             InputStream is = entity.getContent();

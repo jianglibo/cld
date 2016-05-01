@@ -7,3 +7,7 @@
 143 is from jvm.
 
 gradlew -Dhost=192.168.33.50 deploy
+
+some mock hosts:
+
+mirrorlist.centos.org
