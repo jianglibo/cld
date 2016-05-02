@@ -27,6 +27,9 @@ public class WpUrlRepositoryTest extends BaseForTt {
     public WpUrlRepository urlRepo;
     
     @Autowired
+    public WpUrlRepository urlRepo1;
+    
+    @Autowired
     private DSLContext create;
     
     @Before

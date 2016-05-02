@@ -51,7 +51,8 @@ dependencies {
     compile('org.springframework.boot:spring-boot-starter-jooq')
     compile('org.springframework.boot:spring-boot-starter-security')
     compile('org.springframework.boot:spring-boot-starter-aop')
-    compile("org.springframework.boot:spring-boot-starter-hateoas")
+    compile('org.springframework.boot:spring-boot-starter-hateoas')
+    compile('org.atteo:evo-inflector:1.2.1')
 //    compile('org.springframework.boot:spring-boot-starter-data-rest')
 
     compile('org.springframework.data:spring-data-commons')
