@@ -39,10 +39,4 @@ public class HttpClientRedirectTest extends BaseForTt {
             }
         });
     }
-    
-    @Test
-    public void execute() {
-        Executor exec = Executor.newInstance();
-        
-    }
 }

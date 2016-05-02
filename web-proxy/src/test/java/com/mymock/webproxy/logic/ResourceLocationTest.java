@@ -33,7 +33,7 @@ import com.mymock.webproxy.util.MyUtil;
  *         2016年4月20日
  *
  */
-public class OriginRequestTest extends BaseForTt {
+public class ResourceLocationTest extends BaseForTt {
 
     private String s() {
         return null;

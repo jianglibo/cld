@@ -7,11 +7,13 @@ package com.mymock.webproxy.logic.resourcegetter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URISyntaxException;
+import java.util.Arrays;
 import java.util.concurrent.locks.ReentrantLock;
 
 import org.apache.http.Header;
 
 import com.mymock.webproxy.exception.ResourceGetterException;
+import com.mymock.webproxy.logic.HitStatus;
 import com.mymock.webproxy.logic.ResourceLocation;
 import com.mymock.webproxy.logic.bytesprocessor.BytesProcessor;
 import com.mymock.webproxy.logic.bytesprocessor.ToHttpRespFromPartial;
@@ -37,14 +39,16 @@ public abstract class ResourceGetter {
 
     private Header[] headers;
 
-    public ResourceGetter(ResourceLocation rl, BytesProcessor... consumers) {
+    private HitStatus hitStatus;
+
+    public ResourceGetter(ResourceLocation rl, HitStatus hitStatus, BytesProcessor... consumers) {
         this.setRl(rl);
+        this.setHitStatus(hitStatus);
         this.consumers = consumers;
     }
 
     public abstract String play() throws ResourceGetterException, IOException, URISyntaxException;
 
-    
     protected String distributeStream(InputStream is) throws IOException {
         for (BytesProcessor sp : consumers) {
             sp.setHeaders(getHeaders());
@@ -95,7 +99,7 @@ public abstract class ResourceGetter {
         lock.lock();
         try {
             int len = this.consumers.length;
-            BytesProcessor[] bps = new BytesProcessor[len + 1];
+            BytesProcessor[] bps = Arrays.copyOf(this.consumers, this.consumers.length + 1);
             bps[len] = bp;
             this.consumers = bps;
         } finally {
@@ -118,7 +122,7 @@ public abstract class ResourceGetter {
     public void setRl(ResourceLocation rl) {
         this.rl = rl;
     }
-    
+
     public BytesProcessor[] getConsumers() {
         return consumers;
     }
@@ -126,8 +130,16 @@ public abstract class ResourceGetter {
     public void setConsumers(BytesProcessor[] consumers) {
         this.consumers = consumers;
     }
-    
+
     public ReentrantLock getLock() {
         return lock;
+    }
+
+    public HitStatus getHitStatus() {
+        return hitStatus;
+    }
+
+    public void setHitStatus(HitStatus hitStatus) {
+        this.hitStatus = hitStatus;
     }
 }

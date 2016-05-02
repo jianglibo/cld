@@ -18,8 +18,8 @@ import org.junit.Before;
 import org.junit.Test;
 
 import com.mymock.webproxy.exception.ResourceGetterException;
+import com.mymock.webproxy.logic.HitStatus;
 import com.mymock.webproxy.logic.ResourceLocation;
-import com.mymock.webproxy.logic.bytesprocessor.ToDiskFromPartial;
 import com.mymock.webproxy.logic.bytesprocessor.ToDiskWithPath;
 import com.mymock.webproxy.logic.resourcegetter.DiskFileGetter;
 import com.mymock.webproxy.logic.resourcegetter.ResourceGetter;
@@ -61,7 +61,7 @@ public class WriteAndRead {
     public void t() throws ResourceGetterException, IOException, URISyntaxException {
         ResourceLocation rl = new ResourceLocation(fp);
         Path dstFile = fixture.resolve("dst.bin");
-        ResourceGetter rg = new DiskFileGetter(rl, new ToDiskWithPath(dstFile));
+        ResourceGetter rg = new DiskFileGetter(rl, new HitStatus(), new ToDiskWithPath(dstFile));
         rg.play();
         assertThat(Files.size(dstFile) - Files.size(fp), equalTo(0L));
         Files.delete(fp);

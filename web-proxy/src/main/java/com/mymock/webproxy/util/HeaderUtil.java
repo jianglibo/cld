@@ -14,5 +14,9 @@ public class HeaderUtil {
         }
         return false;
     }
+    
+    public static boolean isTransferEncoding(String hn) {
+        return "Transfer-Encoding".equalsIgnoreCase(hn);
+    }
 
 }

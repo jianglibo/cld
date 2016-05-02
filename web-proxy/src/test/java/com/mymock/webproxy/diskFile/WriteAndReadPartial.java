@@ -18,6 +18,7 @@ import org.junit.Before;
 import org.junit.Test;
 
 import com.mymock.webproxy.exception.ResourceGetterException;
+import com.mymock.webproxy.logic.HitStatus;
 import com.mymock.webproxy.logic.ResourceLocation;
 import com.mymock.webproxy.logic.bytesprocessor.ToDiskFromPartial;
 import com.mymock.webproxy.logic.bytesprocessor.ToDiskWithPath;
@@ -57,13 +58,12 @@ public class WriteAndReadPartial {
         os.close();
     }
 
-    
     @Test
     public void partial() throws ResourceGetterException, IOException, URISyntaxException, InterruptedException {
         ResourceLocation rl = new ResourceLocation(fp);
         Path dstPath = fixture.resolve("dst.bin");
         Path partialPath = fixture.resolve("dstpartial.bin");
-        ResourceGetter rg = new DiskFileGetter(rl,new ToDiskWithPath(dstPath),new ToDiskFromPartial(partialPath, dstPath));
+        ResourceGetter rg = new DiskFileGetter(rl, new HitStatus(), new ToDiskWithPath(dstPath), new ToDiskFromPartial(partialPath, dstPath));
         rg.play();
         assertThat(Files.size(dstPath) - Files.size(fp), equalTo(0L));
         assertThat(Files.size(dstPath) - Files.size(partialPath), equalTo(0L));

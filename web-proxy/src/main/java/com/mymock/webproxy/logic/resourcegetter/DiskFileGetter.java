@@ -10,6 +10,7 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 
 import com.mymock.webproxy.exception.ResourceGetterException;
+import com.mymock.webproxy.logic.HitStatus;
 import com.mymock.webproxy.logic.ResourceLocation;
 import com.mymock.webproxy.logic.bytesprocessor.BytesProcessor;
 
@@ -23,8 +24,8 @@ import com.mymock.webproxy.logic.bytesprocessor.BytesProcessor;
 
 public class DiskFileGetter extends ResourceGetter {
 
-    public DiskFileGetter(ResourceLocation rl, BytesProcessor... consumers) {
-        super(rl, consumers);
+    public DiskFileGetter(ResourceLocation rl, HitStatus hitStatus, BytesProcessor... consumers) {
+        super(rl, hitStatus, consumers);
     }
 
     public String play() throws ResourceGetterException, IOException, URISyntaxException {
