@@ -98,6 +98,7 @@ public abstract class ResourceGetter {
     public void addProcessor(ToHttpRespFromPartial bp) {
         lock.lock();
         try {
+            bp.setHeaders(getHeaders());
             int len = this.consumers.length;
             BytesProcessor[] bps = Arrays.copyOf(this.consumers, this.consumers.length + 1);
             bps[len] = bp;

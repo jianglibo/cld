@@ -49,6 +49,9 @@ public class NotFileLikeTest extends BaseForTt {
 
     @Before
     public void bf() {
+        concurrent.set(0);
+        stoped.set(0);
+        hitStatus.reset();
         create.delete(Wpurl.WPURL).execute();
     }
 

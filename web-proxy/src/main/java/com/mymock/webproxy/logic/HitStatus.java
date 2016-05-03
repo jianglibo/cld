@@ -9,7 +9,12 @@ public class HitStatus {
     
     private AtomicInteger httpClientReqCount = new AtomicInteger(0);
     
-    private AtomicInteger mirrorListDbHit = new AtomicInteger(0);
+    private AtomicInteger startCalled = new AtomicInteger(0);
+    
+    public void reset() {
+        httpClientReqCount.set(0);
+        startCalled.set(0);
+    }
 
     public AtomicInteger getHttpClientReqCount() {
         return httpClientReqCount;
@@ -20,11 +25,11 @@ public class HitStatus {
     }
 
     public AtomicInteger getStartCalled() {
-        return mirrorListDbHit;
+        return startCalled;
     }
 
     public void setStartCalled(AtomicInteger mirrorListDbHit) {
-        this.mirrorListDbHit = mirrorListDbHit;
+        this.startCalled = mirrorListDbHit;
     }
     
 }

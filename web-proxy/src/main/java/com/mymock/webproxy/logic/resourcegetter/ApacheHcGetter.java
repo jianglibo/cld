@@ -14,6 +14,8 @@ import org.apache.http.client.ClientProtocolException;
 import org.apache.http.client.ResponseHandler;
 import org.apache.http.client.fluent.Executor;
 import org.apache.http.client.fluent.Request;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.mymock.webproxy.exception.ResourceGetterException;
 import com.mymock.webproxy.logic.HitStatus;
@@ -30,6 +32,8 @@ import com.mymock.webproxy.util.MyHttpClient;
  */
 
 public class ApacheHcGetter extends ResourceGetter {
+    
+    private static final Logger logger = LoggerFactory.getLogger(ApacheHcGetter.class);
 
     private static final Executor executor = Executor.newInstance(new MyHttpClient().getHttpClient());
 
@@ -58,6 +62,7 @@ public class ApacheHcGetter extends ResourceGetter {
             StatusLine statusLine = aresp.getStatusLine();
             setHeaders(aresp.getAllHeaders());
             if (statusLine.getStatusCode() != 200) {
+                logger.info("got status {}, Location: {}, origin url: {} ", statusLine.getStatusCode(), aresp.getAllHeaders(), getRl().getUrlString());
                 for (BytesProcessor sp : getConsumers()) {
                     sp.setHeaders(getHeaders());
                     sp.handleNot200(statusLine.getStatusCode());

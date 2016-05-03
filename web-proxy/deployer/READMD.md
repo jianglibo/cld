@@ -11,3 +11,9 @@ gradlew -Dhost=192.168.33.50 deploy
 some mock hosts:
 
 mirrorlist.centos.org
+
+visudo,
+Defaults    requiretty #comment out
+
+semanage port -l | grep -w http_port_t
+semanage port -a -t http_port_t -p tcp 9008

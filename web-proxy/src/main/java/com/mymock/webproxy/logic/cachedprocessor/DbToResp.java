@@ -8,6 +8,8 @@ import java.util.concurrent.locks.ReentrantLock;
 
 import javax.servlet.http.HttpServletResponse;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -27,6 +29,8 @@ import com.mymock.webproxy.util.HeaderUtil;
 
 @Component
 public class DbToResp implements CachedProcessor {
+    
+    private static final Logger logger = LoggerFactory.getLogger(DbToResp.class);
 
     @Autowired
     private CompositeEnv env;
@@ -69,6 +73,7 @@ public class DbToResp implements CachedProcessor {
         ResourceGetter rg = rLock.getRg(rl);
         
         if (rg == null) {
+            logger.info("create ApacheHcGetter for: {}", rl.getUrlString());
             rg = new ApacheHcGetter(rl, hitStatus, new ToDbWithRl(rl, env), new ToHttpResp(resp, env));
             rLock.addRg(rg, rl);
             urlLock.unlock();

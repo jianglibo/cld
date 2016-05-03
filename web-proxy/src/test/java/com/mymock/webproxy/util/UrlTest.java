@@ -21,6 +21,11 @@ import org.junit.Test;
  *
  */
 public class UrlTest {
+    
+    @Test
+    public void q() {
+        
+    }
 
     @Test
     public void protocal() throws MalformedURLException {

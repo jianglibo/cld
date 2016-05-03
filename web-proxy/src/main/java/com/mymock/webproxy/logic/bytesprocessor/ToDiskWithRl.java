@@ -10,13 +10,9 @@ import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import org.apache.http.Header;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
-import static com.mymock.webproxy.db.public_.tables.Wpurl.WPURL;
-
-import com.google.common.collect.Lists;
-import com.mymock.webproxy.db.public_.tables.records.WpheaderRecord;
-import com.mymock.webproxy.db.public_.tables.records.WpurlRecord;
 import com.mymock.webproxy.domain.Wpheader;
 import com.mymock.webproxy.domain.Wpurl;
 import com.mymock.webproxy.exception.BytesProcessorException;
@@ -32,6 +28,8 @@ import com.mymock.webproxy.util.CompositeEnv;
  *
  */
 public class ToDiskWithRl extends BytesProcessor {
+    
+    private static Logger logger = LoggerFactory.getLogger(ToDiskWithRl.class);
 
     private OutputStream os;
 
@@ -100,6 +98,7 @@ public class ToDiskWithRl extends BytesProcessor {
         
         Path partial = rl.getDiskPath(getEnv().getAppConfig().getParitalPath());
         
+        logger.info("start moving file from {} to {}", partial.toString(), path.toString());
         Files.move(partial, path, StandardCopyOption.ATOMIC_MOVE);
         
         Wpurl url = new Wpurl();

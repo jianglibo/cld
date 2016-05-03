@@ -7,6 +7,8 @@ import java.io.IOException;
 import java.util.List;
 
 import org.apache.http.Header;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.google.common.collect.Lists;
@@ -25,6 +27,8 @@ import com.mymock.webproxy.util.CompositeEnv;
  *
  */
 public class ToDbWithRl extends BytesProcessor {
+    
+    private static Logger logger = LoggerFactory.getLogger(ToDbWithRl.class);
 
     private ResourceLocation rl;
 
@@ -69,9 +73,11 @@ public class ToDbWithRl extends BytesProcessor {
     public void done2() throws IOException {
         //@formatter:off
         List<WpheaderRecord> whrs = Lists.newArrayList();
+        byte[] bytes = os.toByteArray();
         
+        logger.info("start to write length of {} bytes to db", bytes.length);
         WpurlRecord wr = getEnv().getCreate().insertInto(WPURL, WPURL.ADDRESS, WPURL.CONTENT)
-                .values(rl.getUrlString(), os.toByteArray())
+                .values(rl.getUrlString(), bytes)
                 .returning(WPURL.ID)
                 .fetchOne();
         

@@ -5,12 +5,11 @@
 package com.mymock.webproxy.logic;
 
 import static org.hamcrest.Matchers.equalTo;
-import static org.hamcrest.Matchers.greaterThan;
 import static org.junit.Assert.assertThat;
-import static org.junit.Assert.assertTrue;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
+import java.nio.file.Path;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -30,20 +29,18 @@ import com.mymock.webproxy.db.public_.tables.Wpurl;
  *         2016年4月21日
  *
  */
-public class MirrorListTest extends BaseForTt {
-
+public class SqliteBz2Test extends BaseForTt {
+    
     @Autowired
     private DSLContext create;
     
     private AtomicInteger concurrent = new AtomicInteger(0);
     
     private AtomicInteger stoped = new AtomicInteger(0);
-
-    private String url = "/?release=7&arch=x86_64&repo=extras";
     
     @Autowired
     private HitStatus hitStatus;
-
+    
     @Before
     public void bf() {
         concurrent.set(0);
@@ -51,36 +48,40 @@ public class MirrorListTest extends BaseForTt {
         hitStatus.reset();
         create.delete(Wpurl.WPURL).execute();
     }
-
-    // http://mirrorlist.centos.org/?release=7&arch=x86_64&repo=extras
-
-    private void q(Thread main) throws Exception {
+    
+    private void f(Thread main) throws Exception {
+        String host = "repo.mysql.com";
+        String furl = "/yum/mysql-connectors-community/el/7/x86_64/repodata/95754e998234a34bd078685b9688a2ff652c0bbe-primary.sqlite.bz2";
+        
         //@formatter:off
-        mvc.perform(get(url)
-                .header(appConfig.getForwardHeader(), "mirrorlist.centos.org"))
+        mvc.perform(get(furl)
+                .header(appConfig.getForwardHeader(), host))
         .andExpect(status().is2xxSuccessful())
         .andDo(new ResultHandler() {
+            
             @Override
             public void handle(MvcResult result) throws Exception {
-                long fl = result.getResponse().getContentLengthLong();
-                assertThat(fl, greaterThan(0L));
-                com.mymock.webproxy.domain.Wpurl wpurl = create.selectFrom(Wpurl.WPURL).fetchOne().into(com.mymock.webproxy.domain.Wpurl.class);
-                assertTrue(wpurl.getAddress().endsWith(url));
+                long fl = result.getResponse().getContentAsByteArray().length;
+                Path fp = appConfig.getCachePath().resolve(furl.substring(1));
+                printme(fp.toString());
+//                Thread.sleep(1000);
+//                assertThat(fl, equalTo(Files.size(fp)));
             }
         });
         //@formatter:on
-
+        
+        // this time wpurl already in db.
         //@formatter:off
-        mvc.perform(get(url)
-                .header(appConfig.getForwardHeader(), "mirrorlist.centos.org"))
+        mvc.perform(get(furl)
+                .header(appConfig.getForwardHeader(), host))
         .andExpect(status().is2xxSuccessful())
         .andDo(new ResultHandler() {
+            
             @Override
             public void handle(MvcResult result) throws Exception {
-                long fl = result.getResponse().getContentLengthLong();
-                assertThat(fl, greaterThan(0L));
-                com.mymock.webproxy.domain.Wpurl wpurl = create.selectFrom(Wpurl.WPURL).fetchOne().into(com.mymock.webproxy.domain.Wpurl.class);
-                assertTrue(wpurl.getAddress().endsWith(url));
+                long fl = result.getResponse().getContentAsByteArray().length;
+                Path fp = appConfig.getCachePath().resolve(furl.substring(1));
+//                assertThat(fl, equalTo(Files.size(fp)));
             }
         });
         
@@ -91,13 +92,13 @@ public class MirrorListTest extends BaseForTt {
         }
         //@formatter:on
     }
-
+    
     private Thread ct(Thread main) {
         Thread t = new Thread(new Runnable() {
             @Override
             public void run() {
                 try {
-                    q(main);
+                    f(main);
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
@@ -106,10 +107,8 @@ public class MirrorListTest extends BaseForTt {
         return t;
     }
 
-
     @Test
-    public void multipleQ() {
-
+    public void t() throws Exception {
         List<Thread> ts = Lists.newArrayList();
         Thread main = Thread.currentThread();
         stoped.set(0);

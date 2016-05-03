@@ -18,6 +18,9 @@ import org.junit.Test;
 
 public class MyUtilTest {
     
+    
+    
+    
     @Test
     public void split() {
         assertThat("/".split("/").length, equalTo(0));
@@ -61,6 +64,7 @@ public class MyUtilTest {
     @Test
     public void isFileLike() {
         assertTrue(MyUtil.isFileLike("http://www.abc.cc/a.txt"));
+        assertTrue(MyUtil.isFileLike("http://repo.mysql.com/yum/mysql-connectors-community/el/7/x86_64/repodata/95754e998234a34bd078685b9688a2ff652c0bbe-primary.sqlite.bz2"));
         assertFalse(MyUtil.isFileLike("http://www.abc.cc/a"));
         assertFalse(MyUtil.isFileLike("http://www.abc.cc/a.txt?k=v"));
         assertFalse(MyUtil.isFileLike("http://www.abc.cc/a.txt?"));
@@ -110,6 +114,24 @@ public class MyUtilTest {
         url = MyUtil.changePort(url, -1);
         
         assertThat(url.toString(), equalTo("http://www.fh.gov.cn"));
+        
+    }
+    
+    @Test
+    public void subParams() throws MalformedURLException {
+        String qs = "?host=repo.mysql.com";
+        String as = MyUtil.subsParameter(qs, "host");
+        assertThat(as, equalTo(""));
+    }
+    
+    @Test
+    public void host() throws MalformedURLException {
+        URL url = new URL("http://localhost:9008/yum/mysql-connectors-community/el/7/x86_64/repodata/95754e998234a34bd078685b9688a2ff652c0bbe-primary.sqlite.bz2?host=repo.mysql.com");
+        
+        
+        url = MyUtil.changeURLHost(url, "www.cc.cc");
+        
+        assertThat(url.toString(), equalTo("http://www.cc.cc:9008/yum/mysql-connectors-community/el/7/x86_64/repodata/95754e998234a34bd078685b9688a2ff652c0bbe-primary.sqlite.bz2?host=repo.mysql.com"));
         
     }
 

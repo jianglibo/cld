@@ -16,6 +16,7 @@ import java.util.List;
 import java.util.Set;
 import java.util.regex.Pattern;
 
+import com.google.common.base.Strings;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 
@@ -108,7 +109,7 @@ public class MyUtil {
     }
 
     public static URL fromReq(StringBuffer requestUrl, String qs) throws MalformedURLException {
-        if (qs != null) {
+        if (!Strings.isNullOrEmpty(qs)) {
             requestUrl.append("?").append(qs);
         }
         return new URL(requestUrl.toString());
@@ -121,6 +122,9 @@ public class MyUtil {
             String[] pair = pairStr.split("=");
             boolean found = false;
             if (pair.length == 2) {
+                if (pair[0].startsWith("?")) {
+                    pair[0] = pair[0].substring(1);
+                }
                 for (String pn : pns) {
                     if (pn.equalsIgnoreCase(pair[0])) {
                         found = true;

@@ -48,7 +48,7 @@ public class ToHttpRespFromPartial extends BytesProcessor {
         changingSrcFile = rl.getDiskPath(getEnv().getAppConfig().getParitalPath());
         resp.setStatus(HttpStatus.SC_OK);
         for(Header hd : getHeaders()) {
-            resp.addHeader(hd.getName(), hd.getValue());            
+            resp.setHeader(hd.getName(), hd.getValue());            
         }
     }
 
@@ -95,7 +95,7 @@ public class ToHttpRespFromPartial extends BytesProcessor {
     public void handleNot200(int statusCode) {
         resp.setStatus(statusCode);
         for(Header hd : getHeaders()) {
-            resp.addHeader(hd.getName(), hd.getValue());            
+            resp.setHeader(hd.getName(), hd.getValue());            
         }
     }
 

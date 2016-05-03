@@ -62,6 +62,9 @@ public class DiskToResp implements CachedProcessor {
             is.close();
             os.flush();
             os.close();
+        } else {
+            env.getUrlRepo().delete(wpurl.getId());
+            resp.sendRedirect(wpurl.getAddress());
         }
     }
 

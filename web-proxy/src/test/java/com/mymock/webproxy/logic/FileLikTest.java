@@ -9,7 +9,6 @@ import static org.junit.Assert.assertThat;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -44,6 +43,9 @@ public class FileLikTest extends BaseForTt {
     
     @Before
     public void bf() {
+        concurrent.set(0);
+        stoped.set(0);
+        hitStatus.reset();
         create.delete(Wpurl.WPURL).execute();
     }
     

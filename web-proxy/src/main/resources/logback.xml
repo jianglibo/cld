@@ -49,7 +49,7 @@
 	</logger>
 	
 
-	<logger name="cc.openscanner" additivity="true">
+	<logger name="com.mymock" additivity="true" level="info">
 		<appender-ref ref="FILE" />
 	</logger>
 	

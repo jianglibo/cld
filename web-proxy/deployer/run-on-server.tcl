@@ -26,7 +26,6 @@ if {! [file exists $runFolder]} {
   exec mkdir -p $runFolder
 }
 
-exec chown -R "${runUser}:${runGroup}" $runFolder
 
 foreach jar [glob -directory [file join $::baseDir ..] -types f -- *.jar] {
   set tname [file join $runFolder [file tail $jar]]
@@ -45,6 +44,8 @@ if {[catch {exec grep -Ei "^${runUser}:" /etc/passwd} msg o]} {
   exec groupadd $runGroup
   exec useradd -r -g $runGroup -s /bin/false $runUser
 }
+
+exec chown -R "${runUser}:${runGroup}" $runFolder
 
 set strMap "@runFolder@ $runFolder @jarFile@ $tname @profile@ [dict get $::rawParamDict profile ] @runUser@ $runUser @pidFile@ $pidFile"
 
