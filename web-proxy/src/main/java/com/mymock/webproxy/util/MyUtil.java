@@ -94,7 +94,7 @@ public class MyUtil {
 
     public static URL changeURLHost(URL url, String host) throws MalformedURLException {
         StringBuffer sb = new StringBuffer(url.getPath());
-        if (url.getQuery() != null) {
+        if (!Strings.isNullOrEmpty(url.getQuery())) {
             sb.append("?").append(url.getQuery());
         }
         return new URL(url.getProtocol(), host, url.getPort(), sb.toString());
@@ -102,7 +102,7 @@ public class MyUtil {
 
     public static URL changePort(URL url, int port) throws MalformedURLException {
         StringBuffer sb = new StringBuffer(url.getPath());
-        if (url.getQuery() != null) {
+        if (!Strings.isNullOrEmpty(url.getQuery())) {
             sb.append("?").append(url.getQuery());
         }
         return new URL(url.getProtocol(), url.getHost(), port, sb.toString());
@@ -157,6 +157,20 @@ public class MyUtil {
             e.printStackTrace();
         }
         return hnames;
+    }
+
+    /**
+     * @param url
+     * @param procotol
+     * @return
+     * @throws MalformedURLException 
+     */
+    public static URL changeProtocol(URL url, String procotol) throws MalformedURLException {
+        StringBuffer sb = new StringBuffer(url.getPath());
+        if (!Strings.isNullOrEmpty(url.getQuery())) {
+            sb.append("?").append(url.getQuery());
+        }
+        return new URL(procotol, url.getHost(), url.getPort(), sb.toString());
     }
 
 

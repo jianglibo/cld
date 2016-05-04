@@ -36,6 +36,8 @@ public class AppConfig implements InitializingBean {
     
     private Path cachePath;
     
+    private String epelRepoMlsrc;
+    
     private Path paritalPath;
     
     private List<String> myips;
@@ -105,5 +107,13 @@ public class AppConfig implements InitializingBean {
 
     public void setFavoriteMirror(String favoriteMirror) {
         this.favoriteMirror = favoriteMirror;
+    }
+
+    public String getEpelRepoMlsrc() {
+        return epelRepoMlsrc;
+    }
+
+    public void setEpelRepoMlsrc(String epelRepoMlsrc) {
+        this.epelRepoMlsrc = epelRepoMlsrc;
     }
 }

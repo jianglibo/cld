@@ -31,8 +31,9 @@ logging:
 
 myapp:
     cache-folder: e:/webproxycache
-    favorite-mirror: xxxx
+    favorite-mirror: http://mirrors.aliyun.com
     forward-header: x-forwarded-host
+    epel-repo-mlsrc: mirrors.fedoraproject.org
     myips:
         - 127.0.0.1
         - 192.168.33.50
@@ -58,6 +59,7 @@ myapp:
     cache-folder: cache
     favorite-mirror: http://mirrors.aliyun.com
     forward-header: x-forwarded-host
+    epel-repo-mlsrc: mirrors.fedoraproject.org
     myips:
         - 127.0.0.1
         - 192.168.33.50

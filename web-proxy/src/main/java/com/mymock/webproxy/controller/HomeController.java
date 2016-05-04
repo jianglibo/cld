@@ -97,6 +97,10 @@ public class HomeController {
             url = MyUtil.changeURLHost(url, determinedHost);            
         }
         
+//        if (appConfig.getEpelRepoMlsrc().equals(url.getHost())) {
+//            url = MyUtil.changeProtocol(url, "https");
+//        }
+        
         url = MyUtil.changePort(url, -1);
 
         ResourceLocation rl = new ResourceLocation(url);

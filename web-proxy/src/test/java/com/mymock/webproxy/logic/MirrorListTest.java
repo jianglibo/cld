@@ -41,6 +41,8 @@ public class MirrorListTest extends BaseForTt {
 
     private String url = "/?release=7&arch=x86_64&repo=extras";
     
+    private String host = "mirrorlist.centos.org";
+    
     @Autowired
     private HitStatus hitStatus;
 
@@ -57,7 +59,7 @@ public class MirrorListTest extends BaseForTt {
     private void q(Thread main) throws Exception {
         //@formatter:off
         mvc.perform(get(url)
-                .header(appConfig.getForwardHeader(), "mirrorlist.centos.org"))
+                .header(appConfig.getForwardHeader(), host))
         .andExpect(status().is2xxSuccessful())
         .andDo(new ResultHandler() {
             @Override
@@ -72,7 +74,7 @@ public class MirrorListTest extends BaseForTt {
 
         //@formatter:off
         mvc.perform(get(url)
-                .header(appConfig.getForwardHeader(), "mirrorlist.centos.org"))
+                .header(appConfig.getForwardHeader(), host))
         .andExpect(status().is2xxSuccessful())
         .andDo(new ResultHandler() {
             @Override
