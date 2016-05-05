@@ -34,6 +34,10 @@ myapp:
     favorite-mirror: http://mirrors.aliyun.com
     forward-header: x-forwarded-host
     epel-repo-mlsrc: mirrors.fedoraproject.org
+    https-urls:
+        - www.rabbitmq.com/rabbitmq-signing-key-public.asc
+    https-hosts:
+        # place holder.
     myips:
         - 127.0.0.1
         - 192.168.33.50
@@ -60,6 +64,10 @@ myapp:
     favorite-mirror: http://mirrors.aliyun.com
     forward-header: x-forwarded-host
     epel-repo-mlsrc: mirrors.fedoraproject.org
+    https-urls:
+        - www.rabbitmq.com/rabbitmq-signing-key-public.asc
+    https-hosts:
+        # place holder.
     myips:
         - 127.0.0.1
         - 192.168.33.50

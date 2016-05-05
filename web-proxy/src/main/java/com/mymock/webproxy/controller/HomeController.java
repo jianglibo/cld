@@ -34,6 +34,7 @@ import com.mymock.webproxy.exception.ResourceGetterException;
 import com.mymock.webproxy.logic.Orchestrator;
 import com.mymock.webproxy.logic.ResourceLocation;
 import com.mymock.webproxy.repository.WpUrlRepository;
+import com.mymock.webproxy.service.HttpsConvertor;
 import com.mymock.webproxy.util.CompositeEnv;
 import com.mymock.webproxy.util.MyUtil;
 
@@ -53,6 +54,9 @@ public class HomeController {
     
     @Autowired
     private WpUrlRepository wpUrlRepository;
+    
+    @Autowired
+    private HttpsConvertor httpsConvertor;
     
     @Autowired
     private CompositeEnv cenv;
@@ -97,9 +101,7 @@ public class HomeController {
             url = MyUtil.changeURLHost(url, determinedHost);            
         }
         
-//        if (appConfig.getEpelRepoMlsrc().equals(url.getHost())) {
-//            url = MyUtil.changeProtocol(url, "https");
-//        }
+        url = httpsConvertor.convertToHttpsIfNeed(url);
         
         url = MyUtil.changePort(url, -1);
 

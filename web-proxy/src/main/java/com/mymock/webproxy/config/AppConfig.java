@@ -42,6 +42,9 @@ public class AppConfig implements InitializingBean {
     
     private List<String> myips;
     
+    private List<String> httpsUrls;
+    private List<String> httpsHosts;
+    
     private String forwardHeader;
     
     private String favoriteMirror;
@@ -116,4 +119,21 @@ public class AppConfig implements InitializingBean {
     public void setEpelRepoMlsrc(String epelRepoMlsrc) {
         this.epelRepoMlsrc = epelRepoMlsrc;
     }
+
+    public List<String> getHttpsUrls() {
+        return httpsUrls;
+    }
+
+    public void setHttpsUrls(List<String> httpsUrls) {
+        this.httpsUrls = httpsUrls;
+    }
+
+    public List<String> getHttpsHosts() {
+        return httpsHosts;
+    }
+
+    public void setHttpsHosts(List<String> httpsHosts) {
+        this.httpsHosts = httpsHosts;
+    }
+    
 }
