@@ -95,8 +95,8 @@ Vagrant.configure(2) do |config|
 #	  mcluster.vm.network "private_network", ip: "192.168.33.53"
 #  end
 
-  config.vm.define "mongodb" do |mongodb|
-	  mongodb.vm.network "private_network", ip: "192.168.33.53"
+  config.vm.define "webproxy" do |webproxy|
+	  webproxy.vm.network "private_network", ip: "192.168.33.53"
   end
 
   # can not disable this interface.because vagrant use it.
