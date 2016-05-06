@@ -83,6 +83,12 @@ remotes {
 
 task deploy << {
 	String host = System.properties.host
+    String profile = System.properties.profile
+    
+    if (!profile) {
+		println "please add -Dprofile=prod like."
+		System.exit(0)
+    }
 
 	if (!host) {
 		println "please add -Dhost=xxxx"

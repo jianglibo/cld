@@ -1,12 +1,8 @@
 import java.nio.file.Paths;
-import groovy.transform.Field;
 import org.apache.tools.ant.filters.FixCrLfFilter
 import org.apache.tools.ant.taskdefs.FixCRLF
 import org.apache.tools.ant.filters.ReplaceTokens
 
-//https://docs.gradle.org/current/javadoc/org/gradle/api/Project.html
-
-// gradlew :config-server:uploadAndRun -Dprofile=dev
 apply plugin: "io.spring.dependency-management"
 apply plugin: 'java'
 apply plugin: 'eclipse'
@@ -17,7 +13,6 @@ repositories {
     mavenLocal()
     maven { url 'http://repo.spring.io/libs-release-local' }
     maven {url 'http://repo.spring.io/libs-snapshot-local'}
-    maven {url 'https://repo.spring.io/libs-milestone'}
     maven {url 'http://repo.spring.io/libs-milestone-local'}
 }
 
@@ -28,19 +23,14 @@ dependencyManagement {
 }
 
 dependencies {
-    compile 'org.springframework.cloud:spring-cloud-starter-config'
-    compile 'org.springframework.cloud:spring-cloud-config-server'
-    compile 'org.springframework.cloud:spring-cloud-config-monitor'
-    compile 'org.springframework.cloud:spring-cloud-stream-binder-rabbit'
-    compile 'org.springframework.cloud:spring-cloud-starter-eureka'
-    compile 'com.rabbitmq:amqp-client:3.5.7'
+    compile 'org.springframework.cloud:spring-cloud-starter-eureka-server' //
     testCompile("org.springframework.boot:spring-boot-starter-test")
 }
 
 bootRun { systemProperties System.properties }
 
 jar {
-    baseName = 'config-server'
+    baseName = 'eureka-server'
     version = "${bversion}"
 }
 
@@ -51,11 +41,17 @@ test {
 }
 
 remotes {
-    dev {
-        host = System.properties.host ? System.properties.host : '192.168.33.50' //
-        user = 'root' //
-        knownHosts = allowAnyHosts //
-        identity = file(identityFile) //
+    dev51 {
+        host = '192.168.33.51'
+        user = 'root'
+        knownHosts = allowAnyHosts
+        identity = file(identityFile)
+    }
+    dev52 {
+        host = '192.168.33.52'
+        user = 'root'
+        knownHosts = allowAnyHosts
+        identity = file(identityFile)
     }
 }
 
@@ -66,24 +62,23 @@ ext {
     rtmpFolder = "$baseFolder/ttmp/${project.name}"
     runFileAbs = "${rtmpFolder}/$runFile"
     runningDir = "$baseFolder/${project.name}"
-	unitFile = 'config-server.service'
+    unitFile = 'eureka-server.service'
 	systemdFolder = '/etc/systemd/system/'
 }
 
 
 task prepareFiles() << {
 	String profile = System.properties.profile;
-
+	
 	if (!profile) {
-		println "please add -Dprofile=dev etc"
+		println "please add -Dprofile=dev51 etc"
 		System.exit(1)
 	}
-
+	
 	project.ext.profile = profile
-
+    
 	String runningDirString = runningDir
 	String jarFileString = jarFile
-
     delete 'ttmp'
     mkdir 'ttmp'
     copy {
@@ -93,35 +88,37 @@ task prepareFiles() << {
         filter(ReplaceTokens, tokens: [runningDir: runningDirString, jarFile: jarFileString, profile: profile])
     }
     copy {
-        from('build/libs') { include '*.jar' }
+        from("build/libs") { include '*.jar' }
         into "ttmp"
     }
 }
 
+// boot-run.tcl /opt/eureka-server restart xx.jar dev boot.pid
 task uploadAndRun(dependsOn: prepareFiles) << {
-    def profile = System.properties.profile;
-    profile = profile ? profile : 'dev'
+    def profile = System.properties.profile
     def pidFile = System.properties.pidFile
     pidFile = pidFile ? pidFile : 'boot.pid'
-    ssh.run {
-        session(remotes.configServer) {
-            execute "rm -rvf ${rtmpFolder}; mkdir -p ${rtmpFolder}"
-            put from: "${projectDir}/ttmp/**", into: rtmpFolder
-            execute "chmod a+x ${runFileAbs}; ${runFileAbs} $runningDir restart $jarFile $profile $pidFile"
+    
+    def profiles = profile ? [profile] : ['dev51', 'dev52']
+    profiles.each { profileit ->
+        ssh.run {
+            session(remotes[profileit]) {
+                execute "rm -rvf ${rtmpFolder}; mkdir -p ${rtmpFolder}"
+                put from: "${projectDir}/ttmp/**", into: rtmpFolder
+                execute "chmod a+x ${runFileAbs}; ${runFileAbs} $runningDir restart $jarFile $profileit $pidFile"
+            }
         }
     }
 }
 
 task createSystemdUnitFile << {
 	String profile = System.properties.profile;
-
+	
 	if (!profile) {
-		println "please add -Dprofile=dev etc"
+		println "please add -Dprofile=dev51 etc"
 		System.exit(1)
 	}
-
-	project.ext.profile = profile
-
+	
 	ssh.run {
 		session(remotes[profile]) {
       		put from: "${projectDir}/$unitFile", into: systemdFolder
@@ -132,10 +129,11 @@ task createSystemdUnitFile << {
 
 task runSystemd(dependsOn: prepareFiles) << {
     ssh.run {
-        session(remotes[project.ext.profile]) {
+        session(remotes[profile]) {
             execute "rm -rvf ${rtmpFolder}; mkdir -p ${rtmpFolder}"
             put from: "${projectDir}/ttmp/**", into: rtmpFolder
             execute "chmod a+x ${rtmpFolder}/*.tcl;systemctl restart $unitFile"
         }
     }
 }
+

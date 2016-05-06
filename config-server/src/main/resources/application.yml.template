@@ -18,6 +18,18 @@ spring:
         git:
           uri: https://github.com/jianglibo/config-repo
 #          basedir: target/config
+  rabbitmq:
+    host: 192.168.33.50
+    port: 5672
+    username: username
+    password: secret
+
+encrypt:
+  keyStore:
+    location: classpath:/server.jks
+    password: letmein
+    alias: mytestkey
+    secret: letmein
 ---
 spring:
   profiles: dev

@@ -48,3 +48,5 @@ flyway-4.0/conf/flyway.conf
 **/information_schema/tables/pojos/
 
 **/fixturesout/
+*.jks
+**/kh.txt
