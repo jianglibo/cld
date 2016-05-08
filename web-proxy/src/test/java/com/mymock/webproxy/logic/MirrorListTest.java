@@ -65,6 +65,8 @@ public class MirrorListTest extends BaseForTt {
             @Override
             public void handle(MvcResult result) throws Exception {
                 long fl = result.getResponse().getContentLengthLong();
+                String content = result.getResponse().getContentAsString();
+                assertThat(content, equalTo("http://mirrors.aliyun.com/centos/7.2.1511/extras/x86_64/"));
                 assertThat(fl, greaterThan(0L));
                 com.mymock.webproxy.domain.Wpurl wpurl = create.selectFrom(Wpurl.WPURL).fetchOne().into(com.mymock.webproxy.domain.Wpurl.class);
                 assertTrue(wpurl.getAddress().endsWith(url));
