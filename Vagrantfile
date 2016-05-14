@@ -98,6 +98,10 @@ Vagrant.configure(2) do |config|
   config.vm.define "webproxy" do |webproxy|
 	  webproxy.vm.network "private_network", ip: "192.168.33.53"
   end
+  
+  config.vm.define "snn" do |snn|
+    snn.vm.network "private_network", ip: "192.168.33.54"
+  end
 
   # can not disable this interface.because vagrant use it.
   #config.vm.provision "shell", inline: <<-SHELL
