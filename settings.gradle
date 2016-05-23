@@ -1,1 +1,1 @@
-include 'config-server', 'my-mock', 'eureka-server', 'eureka-client', 'authorization-server'
+include 'config-server', 'my-mock', 'eureka-server', 'eureka-client', 'authorization-server', 'gora-hbase'

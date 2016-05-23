@@ -1,0 +1,11 @@
+[Unit]
+Description=Eureka Server
+After=network.target
+
+[Service]
+ExecStart=/opt/ttmp/eureka-server/boot-run-systemd.tcl
+Type=simple
+PIDFile=/var/run/eureka_server.pid
+
+[Install]
+WantedBy=multi-user.target

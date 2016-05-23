@@ -1,0 +1,139 @@
+import java.nio.file.Paths;
+import org.apache.tools.ant.filters.FixCrLfFilter
+import org.apache.tools.ant.taskdefs.FixCRLF
+import org.apache.tools.ant.filters.ReplaceTokens
+
+apply plugin: "io.spring.dependency-management"
+apply plugin: 'java'
+apply plugin: 'eclipse'
+apply plugin: 'spring-boot'
+
+repositories {
+    mavenCentral()
+    mavenLocal()
+    maven { url 'http://repo.spring.io/libs-release-local' }
+    maven {url 'http://repo.spring.io/libs-snapshot-local'}
+    maven {url 'http://repo.spring.io/libs-milestone-local'}
+}
+
+dependencyManagement {
+    imports { //
+        mavenBom "org.springframework.cloud:spring-cloud-starter-parent:${scsp}" //
+    }
+}
+
+dependencies {
+    compile 'org.springframework.cloud:spring-cloud-starter-eureka-server' //
+    testCompile("org.springframework.boot:spring-boot-starter-test")
+}
+
+bootRun { systemProperties System.properties }
+
+jar {
+    baseName = 'eureka-server'
+    version = "${bversion}"
+}
+
+test {
+    filter { //
+        includeTestsMatching "*Test*" //
+    }
+}
+
+remotes {
+    dev51 {
+        host = '192.168.33.51'
+        user = 'root'
+        knownHosts = allowAnyHosts
+        identity = file(identityFile)
+    }
+    dev52 {
+        host = '192.168.33.52'
+        user = 'root'
+        knownHosts = allowAnyHosts
+        identity = file(identityFile)
+    }
+}
+
+ext {
+    baseFolder = '/opt'
+    jarFile = jar.baseName + '-' + jar.version + '.jar'
+    runFile = 'boot-run.tcl'
+    rtmpFolder = "$baseFolder/ttmp/${project.name}"
+    runFileAbs = "${rtmpFolder}/$runFile"
+    runningDir = "$baseFolder/${project.name}"
+    unitFile = 'eureka-server.service'
+	systemdFolder = '/etc/systemd/system/'
+}
+
+
+task prepareFiles() << {
+	String profile = System.properties.profile;
+	
+	if (!profile) {
+		println "please add -Dprofile=dev51 etc"
+		System.exit(1)
+	}
+	
+	project.ext.profile = profile
+    
+	String runningDirString = runningDir
+	String jarFileString = jarFile
+    delete 'ttmp'
+    mkdir 'ttmp'
+    copy {
+        from(projectDir) { include '*.tcl' }
+        into "ttmp"
+        filter(FixCrLfFilter, eol: FixCrLfFilter.CrLf.newInstance('lf'))
+        filter(ReplaceTokens, tokens: [runningDir: runningDirString, jarFile: jarFileString, profile: profile])
+    }
+    copy {
+        from("build/libs") { include '*.jar' }
+        into "ttmp"
+    }
+}
+
+// boot-run.tcl /opt/eureka-server restart xx.jar dev boot.pid
+task uploadAndRun(dependsOn: prepareFiles) << {
+    def profile = System.properties.profile
+    def pidFile = System.properties.pidFile
+    pidFile = pidFile ? pidFile : 'boot.pid'
+    
+    def profiles = profile ? [profile] : ['dev51', 'dev52']
+    profiles.each { profileit ->
+        ssh.run {
+            session(remotes[profileit]) {
+                execute "rm -rvf ${rtmpFolder}; mkdir -p ${rtmpFolder}"
+                put from: "${projectDir}/ttmp/**", into: rtmpFolder
+                execute "chmod a+x ${runFileAbs}; ${runFileAbs} $runningDir restart $jarFile $profileit $pidFile"
+            }
+        }
+    }
+}
+
+task createSystemdUnitFile << {
+	String profile = System.properties.profile;
+	
+	if (!profile) {
+		println "please add -Dprofile=dev51 etc"
+		System.exit(1)
+	}
+	
+	ssh.run {
+		session(remotes[profile]) {
+      		put from: "${projectDir}/$unitFile", into: systemdFolder
+            execute "chmod 664 ${systemdFolder}${unitFile}; systemctl daemon-reload; systemctl enable $unitFile"
+        }
+    }
+}
+
+task runSystemd(dependsOn: prepareFiles) << {
+    ssh.run {
+        session(remotes[profile]) {
+            execute "rm -rvf ${rtmpFolder}; mkdir -p ${rtmpFolder}"
+            put from: "${projectDir}/ttmp/**", into: rtmpFolder
+            execute "chmod a+x ${rtmpFolder}/*.tcl;systemctl restart $unitFile"
+        }
+    }
+}
+
